@@ -341,5 +341,26 @@
     </sql>
   </changeSet>
 
-</databaseChangeLog>
+  <changeSet author="jwhite" id="24.0.0-node-metadata">
+    <createTable tableName="node_metadata" >
+      <column name="nodeid" type="integer">
+        <constraints nullable="false"/>
+      </column>
+      <column name="context" type="varchar(255)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="key" type="varchar(255)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="value" type="text">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    <addPrimaryKey tableName="node_metadata" columnNames="nodeid, context, key" constraintName="node_metadata_pkey" />
+    <addForeignKeyConstraint constraintName="fk_node_metadata_nodeid"
+                             baseTableName="node_metadata" baseColumnNames="nodeid"
+                             referencedTableName="node" referencedColumnNames="nodeid" />
 
+  </changeSet>
+
+</databaseChangeLog>

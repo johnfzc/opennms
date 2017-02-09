@@ -140,6 +140,11 @@ public class OnmsNodeRequisition {
         }
 
         @Override
+        public void visitMetaData(OnmsMetaDataRequisition metaDataReq) {
+            bldr.setMetaDataEntry(metaDataReq.getContext(), metaDataReq.getKey(), metaDataReq.getValue());
+        }
+
+        @Override
         public void visitNodeCategory(final OnmsNodeCategoryRequisition catReq) {
             bldr.addCategory(catReq.getName());
         }
@@ -175,7 +180,6 @@ public class OnmsNodeRequisition {
             nodeBldr.getAssetRecord().setBuilding(nodeReq.getBuilding());
             nodeBldr.getAssetRecord().getGeolocation().setCity(nodeReq.getCity());
         }
-        
     }
     
     /* (non-Javadoc)

@@ -48,6 +48,7 @@ drop table snmpInterface cascade;
 drop table ipInterface cascade;
 drop table alarms cascade;
 drop table memos cascade;
+drop table node_metadata cascade;
 drop table node cascade;
 drop table service cascade;
 drop table scanreports cascade;
@@ -1256,6 +1257,16 @@ create table assets (
 
 create index assets_nodeid_idx on assets(nodeid);
 CREATE INDEX assets_an_idx ON assets(assetNumber);
+
+CREATE TABLE node_metadata (
+    nodeid integer NOT NULL,
+    context character varying(255) NOT NULL,
+    key character varying(255) NOT NULL,
+    value text NOT NULL,
+
+    CONSTRAINT node_metadata_pkey PRIMARY KEY (nodeid, context, key),
+    CONSTRAINT fk_node_metadata_nodeid FOREIGN KEY (nodeid) references node ON DELETE CASCADE
+);
 
 --########################################################################
 --# categories table - Contains list of categories

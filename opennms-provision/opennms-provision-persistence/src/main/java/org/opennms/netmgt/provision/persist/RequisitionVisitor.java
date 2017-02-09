@@ -116,5 +116,16 @@ public interface RequisitionVisitor {
      * @param assetReq a {@link org.opennms.netmgt.provision.persist.OnmsAssetRequisition} object.
      */
     public void completeAsset(OnmsAssetRequisition assetReq);
-
+    /**
+     * <p>visitMetaData</p>
+     *
+     * @param metaDataReq a {@link org.opennms.netmgt.provision.persist.OnmsMetaDataRequisition} object.
+     */
+    public void visitMetaData(OnmsMetaDataRequisition metaDataReq);
+    /**
+     * <p>completeMetaData</p>
+     *
+     * @param metaDataReq a {@link org.opennms.netmgt.provision.persist.OnmsMetaDataRequisition} object.
+     */
+    public void completeMetaData(OnmsMetaDataRequisition metaDataReq);
 }

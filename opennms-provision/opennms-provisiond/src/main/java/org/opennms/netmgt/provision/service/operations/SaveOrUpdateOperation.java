@@ -199,4 +199,8 @@ public abstract class SaveOrUpdateOperation extends ImportOperation {
         }
     }
 
+    public void foundMetaData(String context, String key, String value) {
+        m_node.addMetaData(context, key, value);
+    }
+
 }

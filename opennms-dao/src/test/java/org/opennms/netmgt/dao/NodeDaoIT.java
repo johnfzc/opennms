@@ -670,6 +670,17 @@ public class NodeDaoIT implements InitializingBean {
         m_nodeDao.saveOrUpdate(node2);
         List<OnmsNode> nodes2 = m_nodeDao.findByForeignIdForLocation("TheOpenNMSGroup", location.getLocationName());
         assertEquals(nodes2.get(0), node2);
-        
+    }    
+
+    @Test
+    @Transactional
+    public void testSaveWithMetaData() {
+        OnmsNode node = new OnmsNode(m_locationDao.getDefaultLocation(), "SomeNode");
+        node.addMetaData("ctx", "key", "value");
+        getNodeDao().save(node);
+        getNodeDao().flush();
+
+        OnmsNode retrievedNode = getNodeDao().get(node.getId());
+        assertEquals(1, retrievedNode.getMetaData().size());
     }
 }

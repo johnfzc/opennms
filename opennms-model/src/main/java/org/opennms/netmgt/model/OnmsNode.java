@@ -37,14 +37,18 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -191,6 +195,8 @@ public class OnmsNode extends OnmsEntity implements Serializable, Comparable<Onm
     private Set<String> m_requisitionedCategories = new LinkedHashSet<>();
 
     private PathElement m_pathElement;
+
+    private List<OnmsNodeMetaData> m_metaData = new LinkedList<>();
 
     /**
      * <p>
@@ -960,6 +966,36 @@ public class OnmsNode extends OnmsEntity implements Serializable, Comparable<Onm
 
     public void removeRequisitionedCategory(final String category) {
         m_requisitionedCategories.remove(category);
+    }
+
+    @ElementCollection(fetch = FetchType.LAZY)
+    @JsonIgnore
+    @OneToMany(mappedBy = "node")
+    @org.hibernate.annotations.Cascade(org.hibernate.annotations.CascadeType.ALL)
+    public List<OnmsNodeMetaData> getMetaData() {
+        return m_metaData;
+    }
+
+    public void setMetaData(List<OnmsNodeMetaData> metaData) {
+        m_metaData = metaData;
+    }
+
+    public void addMetaData(String context, String key, String value) {
+        Objects.requireNonNull(context);
+        Objects.requireNonNull(key);
+        Objects.requireNonNull(value);
+
+        final Optional<OnmsNodeMetaData> entry = getMetaData().stream()
+            .filter(m -> m.getContext().equals(context))
+            .filter(m -> m.getKey().equals(key))
+            .findFirst();
+
+        // Update the value if present, otherwise create a new entry
+        if (entry.isPresent()) {
+            entry.get().setValue(value);
+        } else {
+            getMetaData().add(new OnmsNodeMetaData(this, context, key, value));
+        }
     }
 
     /**

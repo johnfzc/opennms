@@ -31,6 +31,7 @@ package org.opennms.netmgt.provision.service;
 import org.opennms.netmgt.provision.persist.AbstractRequisitionVisitor;
 import org.opennms.netmgt.provision.persist.OnmsAssetRequisition;
 import org.opennms.netmgt.provision.persist.OnmsIpInterfaceRequisition;
+import org.opennms.netmgt.provision.persist.OnmsMetaDataRequisition;
 import org.opennms.netmgt.provision.persist.OnmsMonitoredServiceRequisition;
 import org.opennms.netmgt.provision.persist.OnmsNodeCategoryRequisition;
 import org.opennms.netmgt.provision.persist.OnmsNodeRequisition;
@@ -85,5 +86,11 @@ public class RequisitionAccountant extends AbstractRequisitionVisitor {
     @Override
     public void visitAsset(OnmsAssetRequisition assetReq) {
         m_currentOp.foundAsset(assetReq.getName(), assetReq.getValue());
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void visitMetaData(OnmsMetaDataRequisition metaDataReq) {
+        m_currentOp.foundMetaData(metaDataReq.getContext(), metaDataReq.getKey(), metaDataReq.getValue());
     }
 }

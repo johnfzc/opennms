@@ -37,7 +37,7 @@ import org.opennms.netmgt.provision.persist.requisition.Requisition;
  * @author brozow
  * @version $Id: $
  */
-public class AbstractRequisitionVisitor implements RequisitionVisitor {
+public abstract class AbstractRequisitionVisitor implements RequisitionVisitor {
 
     /** {@inheritDoc} */
     @Override
@@ -107,5 +107,15 @@ public class AbstractRequisitionVisitor implements RequisitionVisitor {
     /** {@inheritDoc} */
     @Override
     public void visitServiceCategory(OnmsServiceCategoryRequisition catReq) {
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void visitMetaData(OnmsMetaDataRequisition metaDataReq) {
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void completeMetaData(OnmsMetaDataRequisition metaDataReq) {
     }
 }

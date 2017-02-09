@@ -105,6 +105,7 @@ import org.opennms.netmgt.provision.persist.ForeignSourceRepositoryException;
 import org.opennms.netmgt.provision.persist.MockForeignSourceRepository;
 import org.opennms.netmgt.provision.persist.OnmsAssetRequisition;
 import org.opennms.netmgt.provision.persist.OnmsIpInterfaceRequisition;
+import org.opennms.netmgt.provision.persist.OnmsMetaDataRequisition;
 import org.opennms.netmgt.provision.persist.OnmsMonitoredServiceRequisition;
 import org.opennms.netmgt.provision.persist.OnmsNodeCategoryRequisition;
 import org.opennms.netmgt.provision.persist.OnmsNodeRequisition;
@@ -1891,6 +1892,8 @@ public class ProvisionerIT extends ProvisioningITCase implements InitializingBea
         protected int m_assetCompleted;
         protected List<OnmsNodeRequisition> m_nodes = new ArrayList<>();
         protected List<OnmsIpInterfaceRequisition> m_ifaces = new ArrayList<>();
+        protected int m_metaDataCount;
+        protected int m_metaDataCompleted;
 
         public List<OnmsNodeRequisition> getNodes() {
             return m_nodes;
@@ -1956,6 +1959,14 @@ public class ProvisionerIT extends ProvisioningITCase implements InitializingBea
             return m_assetCompleted;
         }
 
+        public int getMetaDataCount() {
+            return m_metaDataCount;
+        }
+
+        public int getMetaDataCompletedCount() {
+            return m_metaDataCompleted;
+        }
+
         @Override
         public void visitModelImport(final Requisition req) {
             m_modelImportCount++;
@@ -2010,6 +2021,8 @@ public class ProvisionerIT extends ProvisioningITCase implements InitializingBea
             .add("serviceCategoryCompletedCount", getServiceCategoryCompletedCount())
             .add("assetCount", getAssetCount())
             .add("assetCompletedCount", getAssetCompletedCount())
+            .add("metaDataCount", getMetaDataCount())
+            .add("metaDataCompletedCount", getMetaDataCompletedCount())
             .toString();
         }
 
@@ -2046,6 +2059,16 @@ public class ProvisionerIT extends ProvisioningITCase implements InitializingBea
         @Override
         public void completeAsset(OnmsAssetRequisition assetReq) {
             m_assetCompleted++;
+        }
+
+        @Override
+        public void visitMetaData(OnmsMetaDataRequisition metaDataReq) {
+            m_metaDataCount++;
+        }
+
+        @Override
+        public void completeMetaData(OnmsMetaDataRequisition metaDataReq) {
+            m_metaDataCompleted++;
         }
     }
 
