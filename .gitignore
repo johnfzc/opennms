@@ -30,3 +30,5 @@ yarn-error.log
 /features/discovery/activemq-data
 /features/topology-map/org.opennms.features.topology.app/www-test/
 /opennms-alarms/jms-northbounder/activemq-data/
+/opennms-container/**/*.oci
+/opennms-container/**/*.rpm
