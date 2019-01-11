@@ -1,7 +1,7 @@
 /*******************************************************************************
  * This file is part of OpenNMS(R).
  *
- * Copyright (C) 2017-2017 The OpenNMS Group, Inc.
+ * Copyright (C) 2017-2019 The OpenNMS Group, Inc.
  * OpenNMS(R) is Copyright (C) 1999-2017 The OpenNMS Group, Inc.
  *
  * OpenNMS(R) is a registered trademark of The OpenNMS Group, Inc.
@@ -28,64 +28,51 @@
 
 package org.opennms.smoketest.flow;
 
-import java.net.InetSocketAddress;
-import java.util.concurrent.TimeUnit;
-
-import org.junit.Assume;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.Timeout;
-import org.opennms.smoketest.NullTestEnvironment;
-import org.opennms.smoketest.OpenNMSSeleniumTestCase;
 import org.opennms.smoketest.telemetry.FlowTestBuilder;
 import org.opennms.smoketest.telemetry.FlowTester;
 import org.opennms.smoketest.telemetry.Packets;
-import org.opennms.smoketest.telemetry.Ports;
-import org.opennms.test.system.api.NewTestEnvironment;
-import org.opennms.test.system.api.TestEnvironment;
-import org.opennms.test.system.api.TestEnvironmentBuilder;
+import org.testcontainers.containers.DockerComposeContainer;
+import org.testcontainers.containers.wait.strategy.Wait;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.time.Duration;
 
 public class FlowStackIT {
 
-    @Rule
-    public TestEnvironment testEnvironment = getTestEnvironment();
+    private static final String ES_SERVICE_NAME = "elasticsearch";
+    private static final String OPENNMS_SERVICE_NAME = "opennms";
+    private static final int ES_API_PORT = 9200;
+    private static final int OPENNMS_WEB_PORT = 8980;
+    private static final int MAX_TIMEOUT = 5;
 
     @Rule
-    public Timeout timeout = new Timeout(20, TimeUnit.MINUTES);
+    public final DockerComposeContainer environment = new DockerComposeContainer(new File("src/test/resources/flows/flowStack/docker-compose.yml"))
+            .withLocalCompose(true)
+            .withExposedService(ES_SERVICE_NAME, ES_API_PORT, Wait.forHealthcheck().withStartupTimeout(Duration.ofMinutes(MAX_TIMEOUT)))
+            .withExposedService(OPENNMS_SERVICE_NAME, OPENNMS_WEB_PORT, Wait.forHealthcheck().withStartupTimeout(Duration.ofMinutes(MAX_TIMEOUT)));
 
-    private final TestEnvironment getTestEnvironment() {
-        if (!OpenNMSSeleniumTestCase.isDockerEnabled()) {
-            return new NullTestEnvironment();
-        }
-        try {
-            final TestEnvironmentBuilder builder = TestEnvironment.builder().opennms().es5();
-            // Enable flow adapter
-            builder.withOpenNMSEnvironment().addFile(getClass().getResource("/flows/telemetryd-configuration.xml"), "etc/telemetryd-configuration.xml");
-            builder.withOpenNMSEnvironment().addFile(getClass().getResource("/flows/org.opennms.features.flows.persistence.elastic.cfg"), "etc/org.opennms.features.flows.persistence.elastic.cfg");
-            OpenNMSSeleniumTestCase.configureTestEnvironment(builder);
-            return builder.build();
-        } catch (final Throwable t) {
-            throw new RuntimeException(t);
-        }
-    }
-
-    @Before
-    public void checkForDocker() {
-        Assume.assumeTrue(OpenNMSSeleniumTestCase.isDockerEnabled());
-    }
-
-    // Verifies that when OpenNMS and ElasticSearch is running and configured, that sending a flow packet
-    // will actually be persisted in elastic
     @Test
-    public void verifyFlowStack() throws Exception {
-        // Determine endpoints
-        final InetSocketAddress opennmsNetflow5AdapterAddress = testEnvironment.getServiceAddress(NewTestEnvironment.ContainerAlias.OPENNMS, Ports.NETFLOW5_PORT, "udp");
-        final InetSocketAddress opennmsNetflow9AdapterAddress = testEnvironment.getServiceAddress(NewTestEnvironment.ContainerAlias.OPENNMS, Ports.NETFLOW9_PORT, "udp");
-        final InetSocketAddress opennmsIpfixAdapterAddress = testEnvironment.getServiceAddress(NewTestEnvironment.ContainerAlias.OPENNMS, Ports.IPFIX_PORT, "udp");
-        final InetSocketAddress opennmsSflowAdapterAddress = testEnvironment.getServiceAddress(NewTestEnvironment.ContainerAlias.OPENNMS, Ports.SFLOW_PORT, "udp");
-        final InetSocketAddress elasticRestAddress = testEnvironment.getServiceAddress(NewTestEnvironment.ContainerAlias.ELASTICSEARCH_5, 9200, "tcp");
-        final InetSocketAddress opennmsWebAddress = testEnvironment.getServiceAddress(NewTestEnvironment.ContainerAlias.OPENNMS, 8980);
+    public void verifyFlowStack() throws IOException {
+
+        // The stack needs some time after start up before it's ready to process flows.
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        final InetSocketAddress elasticRestAddress = new InetSocketAddress(environment.getServiceHost(ES_SERVICE_NAME, ES_API_PORT), environment.getServicePort(ES_SERVICE_NAME, ES_API_PORT));
+        final InetSocketAddress opennmsWebAddress = new InetSocketAddress(environment.getServiceHost(OPENNMS_SERVICE_NAME, OPENNMS_WEB_PORT), environment.getServicePort(OPENNMS_SERVICE_NAME, OPENNMS_WEB_PORT));
+
+        // This is a workaround because I haven't figured out to create dynamically mapped UDP ports with .withExposedService()
+        final InetSocketAddress opennmsNetflow5AdapterAddress = new InetSocketAddress("localhost", 50000);
+        final InetSocketAddress opennmsNetflow9AdapterAddress = new InetSocketAddress("localhost", 50001);
+        final InetSocketAddress opennmsIpfixAdapterAddress = new InetSocketAddress("localhost", 50002);
+        final InetSocketAddress opennmsSflowAdapterAddress = new InetSocketAddress("localhost", 50003);
 
         final FlowTester flowTester = new FlowTestBuilder()
                 .withFlowPacket(Packets.Netflow5, opennmsNetflow5AdapterAddress)
@@ -96,6 +83,6 @@ public class FlowStackIT {
                 .build(elasticRestAddress);
 
         flowTester.verifyFlows();
-
     }
 }
+
