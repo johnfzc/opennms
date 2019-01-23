@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/bin/bash
 
 BAMBOO_HOST="https://bamboo.opennms.org"
 
@@ -10,12 +10,12 @@ fi
 
 # PARSE URL
 URL=$1
-BUILD=$(echo $URL | awk -F'/' '{ print $NF }')
-PLAN_KEY=$(echo $BUILD | awk -F'-' '{ print $(NF-2) "-" $(NF-1) }')
-BUILD_ID=$(echo $BUILD | awk -F'-' '{ print $NF }')
+BUILD=$(echo "${URL}" | awk -F'/' '{ print $NF }')
+PLAN_KEY=$(echo "${BUILD}" | awk -F'-' '{ print $(NF-2) "-" $(NF-1) }')
+BUILD_ID=$(echo "${BUILD}" | awk -F'-' '{ print $NF }')
 
 # Figure out RPM_VERSION
-RPM_VERSION=$(curl -s ${BAMBOO_HOST}/artifact/$PLAN_KEY/shared/build-$BUILD_ID/RPMs/ | grep -i opennms-core | sed -E 's/(.*>)(opennms-core-)(.*)\.noarch.rpm<\/a>.*/\3/g')
+RPM_VERSION=$(curl -s "${BAMBOO_HOST}/artifact/${PLAN_KEY}/shared/build-${BUILD_ID}/RPMs/" | grep -i opennms-core | sed -E 's/(.*>)(opennms-core-)(.*)\.noarch.rpm<\/a>.*/\3/g')
 
 RPMS_HORIZON=("opennms-${RPM_VERSION}.noarch.rpm"
               "opennms-core-${RPM_VERSION}.noarch.rpm"
@@ -37,7 +37,7 @@ echo "RPM_VERSION: ${RPM_VERSION}"
 echo "RPMS: ${RPMS[*]}"
 
 # ensure everything is initialized
-if [ -z "${BUILD}" -o -z "${PLAN_KEY}" -o -z "${BUILD_ID}" -o -z "${RPM_VERSION}" ]; then
+if [ -z "${BUILD}" ] || [ -z "${PLAN_KEY}" ] || [ -z "${BUILD_ID}" ] || [ -z "${RPM_VERSION}" ]; then
     echo "Something went wrong, not initialized correctly. Bailing.."
     exit 2
 fi
