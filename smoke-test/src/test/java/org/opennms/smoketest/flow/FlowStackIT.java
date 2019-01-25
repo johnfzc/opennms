@@ -28,20 +28,30 @@
 
 package org.opennms.smoketest.flow;
 
+import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.opennms.smoketest.telemetry.FlowTestBuilder;
 import org.opennms.smoketest.telemetry.FlowTester;
 import org.opennms.smoketest.telemetry.Packets;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.DockerComposeContainer;
+import org.testcontainers.containers.output.ToStringConsumer;
 import org.testcontainers.containers.wait.strategy.Wait;
+import org.testcontainers.shaded.org.apache.commons.io.FileUtils;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Duration;
 
 public class FlowStackIT {
+
+    private static final Logger LOG = LoggerFactory.getLogger(FlowStackIT.class);
 
     private static final String ES_SERVICE_NAME = "elasticsearch";
     private static final String OPENNMS_SERVICE_NAME = "opennms";
@@ -49,22 +59,30 @@ public class FlowStackIT {
     private static final int OPENNMS_WEB_PORT = 8980;
     private static final int MAX_TIMEOUT = 5;
 
+    private final ToStringConsumer opennmsLogConsumer = new ToStringConsumer();
+    private final ToStringConsumer elasticLogConsumer = new ToStringConsumer();
+
     @Rule
     public final DockerComposeContainer environment = new DockerComposeContainer(new File("src/test/resources/flows/flowStack/docker-compose.yml"))
             .withLocalCompose(true)
             .withExposedService(ES_SERVICE_NAME, ES_API_PORT, Wait.forHealthcheck().withStartupTimeout(Duration.ofMinutes(MAX_TIMEOUT)))
-            .withExposedService(OPENNMS_SERVICE_NAME, OPENNMS_WEB_PORT, Wait.forHealthcheck().withStartupTimeout(Duration.ofMinutes(MAX_TIMEOUT)));
+            .withExposedService(OPENNMS_SERVICE_NAME, OPENNMS_WEB_PORT, Wait.forHealthcheck().withStartupTimeout(Duration.ofMinutes(MAX_TIMEOUT)))
+            .withLogConsumer(OPENNMS_SERVICE_NAME, opennmsLogConsumer)
+            .withLogConsumer(ES_SERVICE_NAME, elasticLogConsumer);
+
+    @After
+    public void collectLogs() {
+        writeContainerLogs(OPENNMS_SERVICE_NAME, opennmsLogConsumer);
+        writeContainerLogs(ES_SERVICE_NAME, elasticLogConsumer);
+        try {
+            FileUtils.copyDirectory(new File(FlowStackIT.class.getResource("/flows/flowStack/logs").getFile()), Paths.get("target", getClass().getCanonicalName() + "-logdir").toFile());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     @Test
     public void verifyFlowStack() throws IOException {
-
-        // The stack needs some time after start up before it's ready to process flows.
-        try {
-            Thread.sleep(10000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
         final InetSocketAddress elasticRestAddress = new InetSocketAddress(environment.getServiceHost(ES_SERVICE_NAME, ES_API_PORT), environment.getServicePort(ES_SERVICE_NAME, ES_API_PORT));
         final InetSocketAddress opennmsWebAddress = new InetSocketAddress(environment.getServiceHost(OPENNMS_SERVICE_NAME, OPENNMS_WEB_PORT), environment.getServicePort(OPENNMS_SERVICE_NAME, OPENNMS_WEB_PORT));
 
@@ -83,6 +101,16 @@ public class FlowStackIT {
                 .build(elasticRestAddress);
 
         flowTester.verifyFlows();
+    }
+
+    public void writeContainerLogs(String ServiceName, ToStringConsumer toStringConsumer) {
+        final Path logPath = Paths.get("target", getClass().getCanonicalName() + "-" + ServiceName + "-stdout.log");
+
+        try (final FileWriter fw = new FileWriter(logPath.toFile())) {
+            fw.write(toStringConsumer.toUtf8String());
+        } catch (final IOException e) {
+            LOG.warn("Unable to write to {}", logPath, e);
+        }
     }
 }
 
