@@ -6,14 +6,16 @@ FROM ${BASE_IMAGE}:${BASE_IMAGE_VERSION}
 ARG VERSION=${BASE_IMAGE_VERSION}
 ARG BUILD_DATE="1970-01-01T00:00:00+0000"
 
+ARG USER="minion"
+
 ARG REPO_RELEASE="stable"
 ARG REPO_HOST="yum.opennms.org"
 
 ARG REPO_KEY_URL="https://${REPO_HOST}/OPENNMS-GPG-KEY"
 
-ARG REMOTE_RPMS="https://${REPO_HOST}/repofiles/opennms-repo-${REPO_RELEASE}-rhel7.noarch.rpm"
+ARG REPO_RPM="https://${REPO_HOST}/repofiles/opennms-repo-${REPO_RELEASE}-rhel7.noarch.rpm"
 
-ARG PACKAGES="wget gettext opennms-minion"
+ARG PACKAGES="wget gettext"
 
 COPY ./rpms /tmp/rpms
 
@@ -22,20 +24,17 @@ SHELL ["/bin/bash", "-c"]
 # Install repositories, system and OpenNMS packages and do some cleanup
 RUN yum -y install epel-release && \
     rpm --import "${REPO_KEY_URL}" && \
-    yum -y install ${REMOTE_RPMS} && \
+    yum -y install ${REPO_RPM} && \
     if [ "$(ls -1 /tmp/rpms/*.rpm 2>/dev/null | wc -l)" != 0 ]; then cd /tmp/rpms && yum -y localinstall *.rpm; fi && \
     rm -rf /tmp/rpms && \
     yum -y install ${PACKAGES} && \
     yum clean all && \
     rm -rf /var/cache/yum && \
-    chown -R ${USER}:${GROUP} /opt/minion && \
-    sed -r -i '/RUNAS/s/.*/export RUNAS=${USER}/' /etc/sysconfig/minion
-
-USER ${USER}
+    sed -r -i '/RUNAS/s/.*/export RUNAS=${USER}/' /etc/sysconfig/minion && \
+    chgrp -R 0 /opt/minion && \
+    chmod -R g=u /opt/minion
 
 COPY ./entrypoint.sh /
-
-VOLUME [ "/opt/minion/etc", "/opt/minion/etc/featuresBoot.d", "/opt/minion/data" ]
 
 LABEL maintainer="The OpenNMS Group" \
       license="AGPLv3" \
@@ -47,7 +46,10 @@ LABEL maintainer="The OpenNMS Group" \
 
 ENTRYPOINT [ "/entrypoint.sh" ]
 
-CMD [ "-h" ]
+CMD [ "-f" ]
+
+### Containers should NOT run as root as a good practice
+USER 10001
 
 ### Runtime information and not relevant at build time
 
@@ -63,8 +65,8 @@ ENV MINION_ID="00000000-0000-0000-0000-deadbeef0001" \
 ##------------------------------------------------------------------------------
 ## EXPOSED PORTS
 ##------------------------------------------------------------------------------
-## -- OpenNMS KARAF SSH   8201/TCP
-## -- OpenNMS JMX        18980/TCP
-## -- SNMP Trapd           162/UDP
-## -- Syslog               514/UDP
-EXPOSE 8201 18980 162/udp 514/udp
+## -- OpenNMS KARAF SSH    8201/TCP
+## -- OpenNMS JMX         18980/TCP
+## -- SNMP Trapd           1162/UDP
+## -- Syslog               1514/UDP
+EXPOSE 8201/tcp 18980/tcp 1162/udp 1514/udp

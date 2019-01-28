@@ -3,7 +3,7 @@
 BAMBOO_HOST="https://bamboo.opennms.org"
 
 # We need a url
-if [ $# -ne 1 ]; then
+if [[ ${#} -ne 1 ]]; then
     echo "Usage: $0 <url>"
     exit 1
 fi
@@ -34,10 +34,9 @@ echo "BUILD: ${BUILD}"
 echo "PLAN_KEY: ${PLAN_KEY}"
 echo "BUILD_ID: ${BUILD_ID}"
 echo "RPM_VERSION: ${RPM_VERSION}"
-echo "RPMS: ${RPMS[*]}"
 
 # ensure everything is initialized
-if [ -z "${BUILD}" ] || [ -z "${PLAN_KEY}" ] || [ -z "${BUILD_ID}" ] || [ -z "${RPM_VERSION}" ]; then
+if [[ -z "${BUILD}" ]] || [ -z "${PLAN_KEY}" ] || [[ -z "${BUILD_ID}" ]] || [[ -z "${RPM_VERSION}" ]]; then
     echo "Something went wrong, not initialized correctly. Bailing.."
     exit 2
 fi

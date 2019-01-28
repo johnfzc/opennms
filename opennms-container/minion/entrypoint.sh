@@ -10,6 +10,8 @@
 # Cause false/positives
 # shellcheck disable=SC2086
 
+set -x
+
 MINION_HOME="/opt/minion"
 MINION_CONFIG="/opt/minion/etc/org.opennms.minion.controller.cfg"
 MINION_OVERLAY_ETC="/opt/minion-etc-overlay"
@@ -147,15 +149,16 @@ applyOverlayConfig() {
   # Overlay etc specific config
   if [ -d "${MINION_OVERLAY_ETC}" ] && [ -n "$(ls -A ${MINION_OVERLAY_ETC})" ]; then
     echo "Apply custom etc configuration from ${MINION_OVERLAY_ETC}."
-    cp -r ${MINION_OVERLAY_ETC}/* ${MINION_HOME}/etc || exit ${E_INIT_CONFIG}
+    cp -Lr ${MINION_OVERLAY_ETC}/* ${MINION_HOME}/etc || exit ${E_INIT_CONFIG}
   else
     echo "No custom config found in ${MINION_OVERLAY_ETC}. Use default configuration."
   fi
 }
 
 start() {
+    export KARAF_EXEC="exec"
     cd ${MINION_HOME}/bin
-    ./karaf server
+    exec ./karaf server
 }
 
 # Evaluate arguments for build script.

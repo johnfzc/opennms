@@ -11,9 +11,9 @@ ARG REPO_HOST="yum.opennms.org"
 
 ARG REPO_KEY_URL="https://${REPO_HOST}/OPENNMS-GPG-KEY"
 
-ARG REMOTE_RPMS="https://${REPO_HOST}/repofiles/opennms-repo-${REPO_RELEASE}-rhel7.noarch.rpm"
+ARG REPO_RPM="https://${REPO_HOST}/repofiles/opennms-repo-${REPO_RELEASE}-rhel7.noarch.rpm"
 
-ARG PACKAGES="wget gettext opennms-sentinel"
+ARG PACKAGES="wget gettext"
 
 COPY ./rpms /tmp/rpms
 
@@ -22,7 +22,7 @@ SHELL ["/bin/bash", "-c"]
 # Install repositories, system and OpenNMS packages and do some cleanup
 RUN yum -y install epel-release && \
     rpm --import "${REPO_KEY_URL}" && \
-    yum -y install ${REMOTE_RPMS} && \
+    yum -y install ${REPO_RPM} && \
     if [ "$(ls -1 /tmp/rpms/*.rpm 2>/dev/null | wc -l)" != 0 ]; then cd /tmp/rpms && yum -y localinstall *.rpm; fi && \
     rm -rf /tmp/rpms && \
     yum -y install ${PACKAGES} && \
