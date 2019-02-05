@@ -976,11 +976,11 @@ public class OnmsNode extends OnmsEntity implements Serializable, Comparable<Onm
         return m_metaData;
     }
 
-    public void setMetaData(List<OnmsNodeMetaData> metaData) {
+    public void setMetaData(final List<OnmsNodeMetaData> metaData) {
         m_metaData = metaData;
     }
 
-    public void addMetaData(String context, String key, String value) {
+    public void addMetaData(final String context, final String key, final String value) {
         Objects.requireNonNull(context);
         Objects.requireNonNull(key);
         Objects.requireNonNull(value);
@@ -995,6 +995,33 @@ public class OnmsNode extends OnmsEntity implements Serializable, Comparable<Onm
             entry.get().setValue(value);
         } else {
             getMetaData().add(new OnmsNodeMetaData(this, context, key, value));
+        }
+    }
+
+    public void removeMetaData(final String context, final String key) {
+        Objects.requireNonNull(context);
+        Objects.requireNonNull(key);
+        final Iterator<OnmsNodeMetaData> iterator = getMetaData().iterator();
+
+        while (iterator.hasNext()) {
+            final OnmsNodeMetaData onmsNodeMetaData = iterator.next();
+
+            if (context.equals(onmsNodeMetaData.getContext()) && key.equals(onmsNodeMetaData.getKey())) {
+                iterator.remove();
+            }
+        }
+    }
+
+    public void removeMetaData(final String context) {
+        Objects.requireNonNull(context);
+        final Iterator<OnmsNodeMetaData> iterator = getMetaData().iterator();
+
+        while (iterator.hasNext()) {
+            final OnmsNodeMetaData onmsNodeMetaData = iterator.next();
+
+            if (context.equals(onmsNodeMetaData.getContext())) {
+                iterator.remove();
+            }
         }
     }
 

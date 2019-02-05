@@ -39,6 +39,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 @XmlRootElement(name="meta-data")
 @Entity
@@ -63,6 +64,7 @@ public class OnmsNodeMetaData implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "nodeid", nullable = false)
+    @XmlJavaTypeAdapter(NodeIdAdapter.class)
     public OnmsNode getNode(){
         return node;
     }
