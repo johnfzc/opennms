@@ -346,10 +346,10 @@
       <column name="nodeid" type="integer">
         <constraints nullable="false"/>
       </column>
-      <column name="context" type="varchar(255)">
+      <column name="context" type="text">
         <constraints nullable="false"/>
       </column>
-      <column name="key" type="varchar(255)">
+      <column name="key" type="text">
         <constraints nullable="false"/>
       </column>
       <column name="value" type="text">

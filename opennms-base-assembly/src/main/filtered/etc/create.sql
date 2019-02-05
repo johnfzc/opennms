@@ -1260,8 +1260,8 @@ CREATE INDEX assets_an_idx ON assets(assetNumber);
 
 CREATE TABLE node_metadata (
     nodeid integer NOT NULL,
-    context character varying(255) NOT NULL,
-    key character varying(255) NOT NULL,
+    context text NOT NULL,
+    key text NOT NULL,
     value text NOT NULL,
 
     CONSTRAINT node_metadata_pkey PRIMARY KEY (nodeid, context, key),
