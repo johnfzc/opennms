@@ -14,12 +14,14 @@ const RequisitionNode = require('../model/RequisitionNode');
   'use strict';
 
   const assetView = require('../../views/asset.html');
+  const metaDataView = require('../../views/metadata.html');
   const interfaceView = require('../../views/interface.html');
 
   const nodeBasicView = require('../../views/node-basic.html');
   const nodePathoutagesView = require('../../views/node-pathoutages.html');
   const nodeInterfacesView = require('../../views/node-interfaces.html');
   const nodeAssetsView = require('../../views/node-assets.html');
+  const nodeMetaDataView = require('../../views/node-metadata.html');
   const nodeCategoriesView = require('../../views/node-categories.html');
 
   angular.module('onms-requisitions')
@@ -45,6 +47,7 @@ const RequisitionNode = require('../model/RequisitionNode');
     $scope.nodePathoutagesView = nodePathoutagesView;
     $scope.nodeInterfacesView = nodeInterfacesView;
     $scope.nodeAssetsView = nodeAssetsView;
+    $scope.nodeMetaDataView = nodeMetaDataView;
     $scope.nodeCategoriesView = nodeCategoriesView;
 
     /**
@@ -297,6 +300,68 @@ const RequisitionNode = require('../model/RequisitionNode');
     */
     $scope.addAsset = function() {
       $scope.editAsset($scope.node.addNewAsset(), true);
+    };
+
+    /**
+     * @description Shows the dialog for add/edit an metaData entry
+     *
+     * @name NodeController:editMetaData
+     * @ngdoc method
+     * @methodOf NodeController
+     * @param {integer} index The index of the metaData entry to be edited
+     * @param {boolean} isNew true, if the metaData entry is new
+     */
+    $scope.editMetaData = function(index, isNew) {
+        var form = this.nodeForm;
+        var entry = $scope.node.metaData[index];
+        var keyBlackList = [];
+        angular.forEach($scope.node.metaData, function(entry) {
+            keyBlackList.push(entry.key);
+        });
+
+        var modalInstance = $uibModal.open({
+            backdrop: 'static',
+            keyboard: false,
+            controller: 'MetaDataController',
+            templateUrl: metaDataView,
+            resolve: {
+                entry: function() { return angular.copy(entry); },
+                keyBlackList: function() { return keyBlackList; }
+            }
+        });
+
+        modalInstance.result.then(function(result) {
+            angular.copy(result, entry);
+            form.$dirty = true;
+        }, function() {
+            if (isNew) {
+                $scope.node.metaData.pop();
+            }
+        });
+    };
+
+    /**
+     * @description Removes an metaData entry from the local node
+     *
+     * @name NodeController:removeMetaData
+     * @ngdoc method
+     * @methodOf NodeController
+     * @param {integer} index The index of the metaData entry to be removed
+     */
+    $scope.removeMetaData = function(index) {
+        $scope.node.metaData.splice(index, 1);
+        this.nodeForm.$dirty = true;
+    };
+
+    /**
+     * @description Adds a new metaData entry to the local node
+     *
+     * @name NodeController:addMetaData
+     * @ngdoc method
+     * @methodOf NodeController
+     */
+    $scope.addMetaData = function() {
+        $scope.editMetaData($scope.node.addNewMetaData(), true);
     };
 
     /**

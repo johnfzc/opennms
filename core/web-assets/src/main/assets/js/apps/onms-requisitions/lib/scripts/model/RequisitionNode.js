@@ -156,12 +156,25 @@ const RequisitionNode = function RequisitionNode(foreignSource, node, isDeployed
    */
   self.assets = [];
 
+  /**
+   * @description The array of metaData entries
+   * @ngdoc property
+   * @name RequisitionNode#metaData
+   * @propertyOf RequisitionNode
+   * @returns {array} The metaData entries
+   */
+  self.metaData = [];
+
   angular.forEach(node['interface'], function(intf) {
     self.interfaces.push(new RequisitionInterface(intf));
   });
 
   angular.forEach(node['asset'], function(asset) {
     self.assets.push(asset);
+  });
+
+  angular.forEach(node['meta-data'], function(entry) {
+      self.metaData.push(entry);
   });
 
   angular.forEach(node['category'], function(category) {
@@ -218,6 +231,22 @@ const RequisitionNode = function RequisitionNode(foreignSource, node, isDeployed
       value: ''
     });
     return self.assets.length -1;
+  };
+
+  /**
+   * @description Adds a new metaData entry to the node
+   *
+   * @name RequisitionNode:addNewMetaData
+   * @ngdoc method
+   * @methodOf RequisitionNode
+   * @returns {object} the new service Object
+   */
+  self.addNewMetaData = function() {
+      self.metaData.push({
+          key: '',
+          value: ''
+      });
+      return self.metaData.length -1;
   };
 
   /**
@@ -294,6 +323,7 @@ const RequisitionNode = function RequisitionNode(foreignSource, node, isDeployed
       'parent-foreign-id': self.parentForeignId,
       'parent-node-label': self.parentNodeLabel,
       'asset': [],
+      'meta-data': [],
       'category': []
     };
 
@@ -316,6 +346,14 @@ const RequisitionNode = function RequisitionNode(foreignSource, node, isDeployed
 
     angular.forEach(self.assets, function(asset) {
       nodeObject['asset'].push(asset);
+    });
+
+    angular.forEach(self.metaData, function(metaData) {
+      nodeObject['meta-data'].push({
+        'context': 'requisition',
+        'key': metaData.key,
+        'value': metaData.value,
+      });
     });
 
     angular.forEach(self.categories, function(category) {
