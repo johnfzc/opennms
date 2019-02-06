@@ -83,6 +83,7 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonValue;
 import org.codehaus.jackson.map.annotate.JsonDeserialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
+import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.Type;
 import org.opennms.core.utils.InetAddressUtils;
@@ -196,7 +197,7 @@ public class OnmsNode extends OnmsEntity implements Serializable, Comparable<Onm
 
     private PathElement m_pathElement;
 
-    private List<OnmsNodeMetaData> m_metaData = new LinkedList<>();
+    private List<OnmsNodeMetaData> m_metaData = new ArrayList<>();
 
     /**
      * <p>
@@ -968,16 +969,15 @@ public class OnmsNode extends OnmsEntity implements Serializable, Comparable<Onm
         m_requisitionedCategories.remove(category);
     }
 
-    @ElementCollection(fetch = FetchType.LAZY)
     @JsonIgnore
-    @OneToMany(mappedBy = "node")
-    @org.hibernate.annotations.Cascade(org.hibernate.annotations.CascadeType.ALL)
+    @OneToMany(/*mappedBy = "node", */cascade = CascadeType.ALL, orphanRemoval = true)
     public List<OnmsNodeMetaData> getMetaData() {
         return m_metaData;
     }
 
     public void setMetaData(final List<OnmsNodeMetaData> metaData) {
-        m_metaData = metaData;
+        m_metaData.clear();
+        m_metaData.addAll(metaData);
     }
 
     public void addMetaData(final String context, final String key, final String value) {
@@ -1530,6 +1530,17 @@ public class OnmsNode extends OnmsEntity implements Serializable, Comparable<Onm
     }
 
     /**
+     * Truly merges the node's meta data
+     *
+     * @param scannedNode a {@link org.opennms.netmgt.model.OnmsNode} object.
+     */
+    public void mergeMetaData(OnmsNode scannedNode) {
+        if (!getMetaData().equals(scannedNode.getMetaData())) {
+            setMetaData(scannedNode.getMetaData());
+        }
+    }
+
+    /**
      * Simply replaces the current asset record with the new record
      *
      * @param scannedNode a {@link org.opennms.netmgt.model.OnmsNode} object.
@@ -1558,6 +1569,8 @@ public class OnmsNode extends OnmsEntity implements Serializable, Comparable<Onm
         mergeCategorySet(scannedNode);
 
         mergeAssets(scannedNode);
+
+        mergeMetaData(scannedNode);
     }
 
     @Transient

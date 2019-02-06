@@ -31,6 +31,7 @@ package org.opennms.netmgt.model;
 import java.io.Serializable;
 import java.util.Objects;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -62,7 +63,7 @@ public class OnmsNodeMetaData implements Serializable {
         this.value = Objects.requireNonNull(value);
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "nodeid", nullable = false)
     @XmlJavaTypeAdapter(NodeIdAdapter.class)
     public OnmsNode getNode(){
@@ -101,5 +102,4 @@ public class OnmsNodeMetaData implements Serializable {
     public void setValue(String value) {
         this.value = value;
     }
-
 }

@@ -40,6 +40,7 @@ import org.opennms.netmgt.model.OnmsNode.NodeType;
 import org.opennms.netmgt.provision.persist.requisition.RequisitionAsset;
 import org.opennms.netmgt.provision.persist.requisition.RequisitionCategory;
 import org.opennms.netmgt.provision.persist.requisition.RequisitionInterface;
+import org.opennms.netmgt.provision.persist.requisition.RequisitionMetaData;
 import org.opennms.netmgt.provision.persist.requisition.RequisitionNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,6 +56,7 @@ public class OnmsNodeRequisition {
     private String m_foreignSource;
     private RequisitionNode m_node;
     private List<OnmsAssetRequisition> m_assetReqs;
+    private List<OnmsMetaDataRequisition> m_metaDataReqs;
     private List<OnmsIpInterfaceRequisition> m_ifaceReqs;
     private List<OnmsNodeCategoryRequisition> m_categoryReqs;
 
@@ -65,6 +67,7 @@ public class OnmsNodeRequisition {
         m_foreignSource = foreignSource;
         m_node = node;
         m_assetReqs = constructAssetRequistions();
+        m_metaDataReqs = constructMetaDataRequistions();
         m_ifaceReqs = constructIpInterfaceRequistions();
         m_categoryReqs = constructCategoryRequistions();
     }
@@ -85,6 +88,14 @@ public class OnmsNodeRequisition {
     	final List<OnmsAssetRequisition> reqs = new ArrayList<OnmsAssetRequisition>(m_node.getAssets().size());
         for(final RequisitionAsset asset : m_node.getAssets()) {
             reqs.add(new OnmsAssetRequisition(asset));
+        }
+        return reqs;
+    }
+
+    private List<OnmsMetaDataRequisition> constructMetaDataRequistions() {
+        final List<OnmsMetaDataRequisition> reqs = new ArrayList<>(m_node.getMetaData().size());
+        for(final RequisitionMetaData metaData : m_node.getMetaData()) {
+            reqs.add(new OnmsMetaDataRequisition(metaData));
         }
         return reqs;
     }
@@ -123,6 +134,9 @@ public class OnmsNodeRequisition {
         }
         for(final OnmsAssetRequisition assetReq : m_assetReqs) {
             assetReq.visit(visitor);
+        }
+        for(final OnmsMetaDataRequisition metaDataReq : m_metaDataReqs) {
+            metaDataReq.visit(visitor);
         }
         visitor.completeNode(this);
     }
