@@ -706,7 +706,7 @@ public class NodeDaoIT implements InitializingBean {
 
         m_transTemplate.execute((ts) -> {
             OnmsNode node = getNodeDao().get(nodeId);
-            node.setMetaData(Arrays.asList(new OnmsNodeMetaData(node, "ctx", "foo", "bar")));
+            node.setMetaData(Arrays.asList(new OnmsNodeMetaData("ctx", "foo", "bar")));
             getNodeDao().update(node);
             getNodeDao().flush();
 

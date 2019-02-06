@@ -37,7 +37,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -47,6 +46,7 @@ import java.util.Set;
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
 import javax.persistence.CascadeType;
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Embedded;
@@ -83,7 +83,6 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonValue;
 import org.codehaus.jackson.map.annotate.JsonDeserialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
-import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.Type;
 import org.opennms.core.utils.InetAddressUtils;
@@ -970,14 +969,15 @@ public class OnmsNode extends OnmsEntity implements Serializable, Comparable<Onm
     }
 
     @JsonIgnore
-    @OneToMany(/*mappedBy = "node", */cascade = CascadeType.ALL, orphanRemoval = true)
+    @XmlTransient
+    @ElementCollection
+    @CollectionTable(name="node_metadata", joinColumns = @JoinColumn(name = "nodeid"))
     public List<OnmsNodeMetaData> getMetaData() {
         return m_metaData;
     }
 
     public void setMetaData(final List<OnmsNodeMetaData> metaData) {
-        m_metaData.clear();
-        m_metaData.addAll(metaData);
+        m_metaData = metaData;
     }
 
     public void addMetaData(final String context, final String key, final String value) {
@@ -994,7 +994,7 @@ public class OnmsNode extends OnmsEntity implements Serializable, Comparable<Onm
         if (entry.isPresent()) {
             entry.get().setValue(value);
         } else {
-            getMetaData().add(new OnmsNodeMetaData(this, context, key, value));
+            getMetaData().add(new OnmsNodeMetaData(context, key, value));
         }
     }
 
