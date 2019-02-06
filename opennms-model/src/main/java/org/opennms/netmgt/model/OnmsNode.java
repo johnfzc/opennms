@@ -970,7 +970,7 @@ public class OnmsNode extends OnmsEntity implements Serializable, Comparable<Onm
 
     @JsonIgnore
     @XmlTransient
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name="node_metadata", joinColumns = @JoinColumn(name = "nodeid"))
     public List<OnmsNodeMetaData> getMetaData() {
         return m_metaData;
