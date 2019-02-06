@@ -31,18 +31,9 @@ package org.opennms.netmgt.model;
 import java.io.Serializable;
 import java.util.Objects;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import javax.persistence.Embedded;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 @XmlRootElement(name="meta-data")
 @Embeddable
@@ -54,7 +45,8 @@ public class OnmsNodeMetaData implements Serializable {
     private String key;
     private String value;
 
-    public OnmsNodeMetaData() { }
+    public OnmsNodeMetaData() {
+    }
 
     public OnmsNodeMetaData(String context, String key, String value) {
         this.context = Objects.requireNonNull(context);
