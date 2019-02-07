@@ -5,7 +5,7 @@
     <button type="button" class="btn btn-default btn-sm pull-right" id="add-metadata" ng-click="addMetaData()">
       <span class="glyphicon glyphicon-plus-sign"/> Add Meta Data
     </button>
-    <h4>Context: requisition</h4>
+    <h5><b>Context:</b> requisition</h5>
   </div>
 
   <table class="table table-striped table-condensed">
@@ -36,7 +36,7 @@
 </div>
 
 <div class="table-responsive" ng-repeat="context in Utils.keys(node.otherMetaData) | orderBy">
-  <h4>Context: {{context}}</h4>
+  <h5><b>Context:</b> {{context}}</h5>
 
   <table class="table table-striped table-condensed">
     <thead>
