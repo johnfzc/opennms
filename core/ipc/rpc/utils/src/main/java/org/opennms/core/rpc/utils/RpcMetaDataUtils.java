@@ -28,6 +28,7 @@
 
 package org.opennms.core.rpc.utils;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
@@ -39,8 +40,31 @@ import org.opennms.netmgt.dao.api.NodeDao;
 import org.opennms.netmgt.model.OnmsNode;
 import org.opennms.netmgt.model.OnmsNodeMetaData;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.google.common.collect.Maps;
 
 public class RpcMetaDataUtils {
+    public static class MetaDataMerger {
+        final Map<String, Map<String, String>> metaData = Maps.newHashMap();
+
+        public MetaDataMerger() {}
+
+        public MetaDataMerger merge(Map<String, Map<String, String>> other) {
+            for (final Map.Entry<String, Map<String, String>> entry : other.entrySet()) {
+                this.metaData
+                        .putIfAbsent(entry.getKey(), new TreeMap<>())
+                        .putAll(entry.getValue());
+            }
+
+            return this;
+        }
+
+        public Map<String, Map<String, String>> getMetaData() {
+            return this.metaData;
+        }
+    }
+
     private static final String OUTER_REGEXP = "\\$\\{(.+?:.+?)\\}";
     private static final String INNER_REGEXP = "(?:([^\\|]+?:[^\\|]+)|([^\\|]+))";
     private static final Pattern OUTER_PATTERN = Pattern.compile(OUTER_REGEXP);
@@ -49,49 +73,47 @@ public class RpcMetaDataUtils {
     @Autowired(required = false)
     private NodeDao nodeDao;
 
-    public Map<String, Object> interpolateObjects(final int nodeId, final Map<String, Object> attributesMap) {
-        return attributesMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> matchAndReplaceObject(getMetaData(nodeId), e.getValue())));
+    public Map<String, Object> interpolateObjects(final int nodeId, final Map<String, Object> attributesMap, Map<String, Map<String, String>>... others) {
+        return attributesMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> matchAndReplaceObject(getMetaData(nodeId, others), e.getValue())));
     }
 
-    public Map<String, String> interpolateStrings(final int nodeId, final Map<String, String> attributesMap) {
-        return attributesMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> matchAndReplaceString(getMetaData(nodeId), e.getValue())));
+    public Map<String, String> interpolateStrings(final int nodeId, final Map<String, String> attributesMap, Map<String, Map<String, String>>... others) {
+        return attributesMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> matchAndReplaceString(getMetaData(nodeId, others), e.getValue())));
     }
 
-    public Map<String, Map<String, String>> getMetaData(final int nodeId) {
-        final Map<String, Map<String, String>> metaDataMap;
+    @Transactional
+    public Map<String, Map<String, String>> getMetaData(final int nodeId, Map<String, Map<String, String>>... others) {
+        final MetaDataMerger merger = new MetaDataMerger();
 
         final OnmsNode onmsNode = nodeDao.get(nodeId);
-
         if (onmsNode != null) {
-            metaDataMap = mergeMetaData(onmsNode.getMetaData());
-        } else {
-            metaDataMap = new TreeMap<>();
+            merger.merge(transform(onmsNode.getMetaData()));
         }
 
-        return metaDataMap;
+        Arrays.stream(others).forEachOrdered(merger::merge);
+
+        return merger.getMetaData();
     }
 
-    private Map<String, Map<String, String>> mergeMetaData(Collection<OnmsNodeMetaData>... lists) {
-        final Map<String, Map<String, String>> metaData = new TreeMap<>();
+    private static Map<String, Map<String, String>> transform(Collection<OnmsNodeMetaData> onmsMetaData) {
+        final Map<String, Map<String, String>> transformed = new TreeMap<>();
 
-        for (final Collection<OnmsNodeMetaData> collection : lists) {
-            for (final OnmsNodeMetaData onmsNodeMetaData : collection) {
-                metaData.putIfAbsent(onmsNodeMetaData.getContext(), new TreeMap<>());
-                metaData.get(onmsNodeMetaData.getContext()).put(onmsNodeMetaData.getKey(), onmsNodeMetaData.getValue());
-            }
+        for (final OnmsNodeMetaData entry : onmsMetaData) {
+            transformed.putIfAbsent(entry.getContext(), new TreeMap<>())
+                    .put(entry.getKey(), entry.getValue());
         }
 
-        return metaData;
+        return transformed;
     }
 
-    private Object matchAndReplaceObject(final Map<String, Map<String, String>> metaDataMap, Object value) {
+    private static Object matchAndReplaceObject(final Map<String, Map<String, String>> metaDataMap, Object value) {
         if (value instanceof String) {
             return matchAndReplaceString(metaDataMap, (String) value);
         }
         return value;
     }
 
-    private String matchAndReplaceString(final Map<String, Map<String, String>> metaDataMap, String value) {
+    private static String matchAndReplaceString(final Map<String, Map<String, String>> metaDataMap, String value) {
             final StringBuffer stringBuffer = new StringBuffer();
             final Matcher outerMatcher = OUTER_PATTERN.matcher(value);
             while (outerMatcher.find()) {
@@ -118,7 +140,7 @@ public class RpcMetaDataUtils {
             return stringBuffer.toString();
     }
 
-    Map<String, Object> matchAndReplaceMetaData(Map<String, Map<String, String>> metaDataMap, Map<String, Object> attributesMap) {
+    static Map<String, Object> matchAndReplaceMetaData(Map<String, Map<String, String>> metaDataMap, Map<String, Object> attributesMap) {
         final Map<String, Object> interpolatedAttributes = new TreeMap<>(attributesMap);
         for (Map.Entry<String, Object> entry : interpolatedAttributes.entrySet().stream()
                 .filter(e -> e.getValue() instanceof String)
