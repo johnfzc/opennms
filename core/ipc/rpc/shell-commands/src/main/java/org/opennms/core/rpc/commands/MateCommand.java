@@ -68,10 +68,10 @@ public class MateCommand implements Action {
 
             final Map<String, Map<String, String>> metaDataMap = rpcMetaDataUtils.getMetaData(nodeId);
 
-            System.out.printf("Meta-Data for node with Id %d\n---\n", nodeId);
+            System.out.printf("Meta-Data for node with nodeId=%d\n---\n", nodeId);
 
             for (final Map.Entry<String, Map<String, String>> outerEntry : metaDataMap.entrySet()) {
-                System.out.println(outerEntry.getKey());
+                System.out.printf("%s:\n", outerEntry.getKey());
                 for (final Map.Entry<String, String> innerEntry : outerEntry.getValue().entrySet()) {
                     System.out.printf("  %s='%s'\n", innerEntry.getKey(), innerEntry.getValue());
                 }
@@ -81,7 +81,7 @@ public class MateCommand implements Action {
             inputMap.put("expression", expression);
             Map<String, String> outputMap = rpcMetaDataUtils.interpolateStrings(nodeId, inputMap);
 
-            System.out.printf("\n---\nInput: '%s'\nOutput: '%s' ", nodeId, expression, outputMap.get("expression"));
+            System.out.printf("---\nInput: '%s'\nOutput: '%s'\n", expression, outputMap.get("expression"));
         }catch(Exception e) {
             e.printStackTrace();
         }

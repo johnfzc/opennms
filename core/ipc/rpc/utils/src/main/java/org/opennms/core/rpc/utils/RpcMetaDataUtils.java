@@ -40,7 +40,7 @@ import org.opennms.netmgt.dao.api.NodeDao;
 import org.opennms.netmgt.model.OnmsNode;
 import org.opennms.netmgt.model.OnmsNodeMetaData;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import com.google.common.collect.Maps;
 
@@ -48,7 +48,8 @@ public class RpcMetaDataUtils {
     public static class MetaDataMerger {
         final Map<String, Map<String, String>> metaData = Maps.newHashMap();
 
-        public MetaDataMerger() {}
+        public MetaDataMerger() {
+        }
 
         public MetaDataMerger merge(Map<String, Map<String, String>> other) {
             for (final Map.Entry<String, Map<String, String>> entry : other.entrySet()) {
@@ -71,7 +72,10 @@ public class RpcMetaDataUtils {
 
     @Autowired(required = false)
     private NodeDao nodeDao;
-    
+
+    @Autowired
+    private TransactionTemplate transactionTemplate;
+
     public Map<String, Object> interpolateObjects(final int nodeId, final Map<String, Object> attributesMap, Map<String, Map<String, String>>... others) {
         return attributesMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> matchAndReplaceObject(getMetaData(nodeId, others), e.getValue())));
     }
@@ -80,21 +84,21 @@ public class RpcMetaDataUtils {
         return attributesMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> matchAndReplaceString(getMetaData(nodeId, others), e.getValue())));
     }
 
-    @Transactional
     public Map<String, Map<String, String>> getMetaData(final int nodeId, Map<String, Map<String, String>>... others) {
         final MetaDataMerger merger = new MetaDataMerger();
 
-        final OnmsNode onmsNode = nodeDao.get(nodeId);
-        if (onmsNode != null) {
-            merger.merge(transform(onmsNode.getMetaData()));
-        }
-
+        transactionTemplate.execute((tx) -> {
+            final OnmsNode onmsNode = nodeDao.get(nodeId);
+            if (onmsNode != null) {
+                merger.merge(transform(onmsNode.getMetaData()));
+            }
+            return null;
+        });
         Arrays.stream(others).forEachOrdered(merger::merge);
 
         return merger.getMetaData();
     }
 
-    @Transactional
     private static Map<String, Map<String, String>> transform(Collection<OnmsNodeMetaData> onmsMetaData) {
         final Map<String, Map<String, String>> transformed = new TreeMap<>();
 
@@ -114,30 +118,30 @@ public class RpcMetaDataUtils {
     }
 
     private static String matchAndReplaceString(final Map<String, Map<String, String>> metaDataMap, String value) {
-            final StringBuffer stringBuffer = new StringBuffer();
-            final Matcher outerMatcher = OUTER_PATTERN.matcher(value);
-            while (outerMatcher.find()) {
-                final Matcher innerMatcher = INNER_PATTERN.matcher(outerMatcher.group(1));
-                String replacementValue = "";
-                while (innerMatcher.find()) {
-                    if (innerMatcher.group(1) != null) {
-                        final String[] arr = innerMatcher.group(1).split(":");
-                        if (metaDataMap.containsKey(arr[0])) {
-                            if (metaDataMap.get(arr[0]).containsKey(arr[1])) {
-                                replacementValue = Matcher.quoteReplacement(metaDataMap.get(arr[0]).get(arr[1]));
-                                break;
-                            }
+        final StringBuffer stringBuffer = new StringBuffer();
+        final Matcher outerMatcher = OUTER_PATTERN.matcher(value);
+        while (outerMatcher.find()) {
+            final Matcher innerMatcher = INNER_PATTERN.matcher(outerMatcher.group(1));
+            String replacementValue = "";
+            while (innerMatcher.find()) {
+                if (innerMatcher.group(1) != null) {
+                    final String[] arr = innerMatcher.group(1).split(":");
+                    if (metaDataMap.containsKey(arr[0])) {
+                        if (metaDataMap.get(arr[0]).containsKey(arr[1])) {
+                            replacementValue = Matcher.quoteReplacement(metaDataMap.get(arr[0]).get(arr[1]));
+                            break;
                         }
                     }
-                    if (innerMatcher.group(2) != null) {
-                        replacementValue = Matcher.quoteReplacement(innerMatcher.group(2));
-                        break;
-                    }
                 }
-                outerMatcher.appendReplacement(stringBuffer, replacementValue);
+                if (innerMatcher.group(2) != null) {
+                    replacementValue = Matcher.quoteReplacement(innerMatcher.group(2));
+                    break;
+                }
             }
-            outerMatcher.appendTail(stringBuffer);
-            return stringBuffer.toString();
+            outerMatcher.appendReplacement(stringBuffer, replacementValue);
+        }
+        outerMatcher.appendTail(stringBuffer);
+        return stringBuffer.toString();
     }
 
     static Map<String, Object> matchAndReplaceMetaData(Map<String, Map<String, String>> metaDataMap, Map<String, Object> attributesMap) {
