@@ -56,22 +56,23 @@ public class RpcMetaDataUtilsTest {
         final RpcMetaDataUtils rpcMetaDataUtils = new RpcMetaDataUtils();
         final Map<String, Object> attributes = new TreeMap<>();
 
-        attributes.put("attribute1", "aaa$[ctx1:key1|ctx2:key2|default]bbb");
-        attributes.put("attribute2", "aaa$[ctx1:key3|ctx2:key3|default]bbb");
-        attributes.put("attribute3", "aaa$[ctx1:key4|ctx2:key1|default]bbb");
-        attributes.put("attribute4", "aaa$[ctx1:key4]bbb");
-        attributes.put("attribute5", "aaa$[ctx1:key4|]bbb");
-        attributes.put("attribute6", "aaa$[ctx1:key4|default]bbb");
+        attributes.put("attribute1", "aaa${ctx1:key1|ctx2:key2|default}bbb");
+        attributes.put("attribute2", "aaa${ctx1:key3|ctx2:key3|default}bbb");
+        attributes.put("attribute3", "aaa${ctx1:key4|ctx2:key1|default}bbbaaa${ctx1:key4|ctx2:key4|default}bbb");
+        attributes.put("attribute4", "aaa${ctx1:key4}bbb");
+        attributes.put("attribute5", "aaa${ctx1:key4|}bbb");
+        attributes.put("attribute6", "aaa${ctx1:key4|default}bbb");
         attributes.put("attribute7", new Integer(42));
         attributes.put("attribute8", new Long(42L));
-        attributes.put("attribute9", "aaa$[ctx1:key4|${nodeLabel}]bbb");
+        attributes.put("attribute9", "aaa${ctx1:key4|${nodeLabel}}bbb");
+        attributes.put("attribute10", "aaa${abc}bbb");
 
         final Map<String, Object> interpolatedAttributes = rpcMetaDataUtils.matchAndReplaceMetaData(metaData, attributes);
 
         Assert.assertEquals(attributes.size(), interpolatedAttributes.size());
         Assert.assertEquals("aaaval1bbb", interpolatedAttributes.get("attribute1"));
         Assert.assertEquals("aaaval3bbb", interpolatedAttributes.get("attribute2"));
-        Assert.assertEquals("aaadefaultbbb", interpolatedAttributes.get("attribute3"));
+        Assert.assertEquals("aaadefaultbbbaaaval4bbb", interpolatedAttributes.get("attribute3"));
         Assert.assertEquals("aaabbb", interpolatedAttributes.get("attribute4"));
         Assert.assertEquals("aaabbb", interpolatedAttributes.get("attribute5"));
         Assert.assertEquals("aaadefaultbbb", interpolatedAttributes.get("attribute6"));
@@ -80,5 +81,6 @@ public class RpcMetaDataUtilsTest {
         Assert.assertEquals(42, interpolatedAttributes.get("attribute7"));
         Assert.assertEquals(42L, interpolatedAttributes.get("attribute8"));
         Assert.assertEquals("aaa${nodeLabel}bbb", interpolatedAttributes.get("attribute9"));
+        Assert.assertEquals("aaa${abc}bbb", interpolatedAttributes.get("attribute10"));
     }
 }

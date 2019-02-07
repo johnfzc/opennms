@@ -41,7 +41,7 @@ import org.opennms.netmgt.model.OnmsNodeMetaData;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class RpcMetaDataUtils {
-    private static final String OUTER_REGEXP = "\\$\\[([^\\[\\]]+?)\\]";
+    private static final String OUTER_REGEXP = "\\$\\{(.+?:.+?)\\}";
     private static final String INNER_REGEXP = "(?:([^\\|]+?:[^\\|]+)|([^\\|]+))";
     private static final Pattern OUTER_PATTERN = Pattern.compile(OUTER_REGEXP);
     private static final Pattern INNER_PATTERN = Pattern.compile(INNER_REGEXP);
