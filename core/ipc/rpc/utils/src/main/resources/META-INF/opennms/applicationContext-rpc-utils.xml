@@ -15,7 +15,7 @@
 
     <context:annotation-config />
     <tx:annotation-driven/>
-    
+
     <bean name="rpcTargetHelper" class="org.opennms.core.rpc.utils.RpcTargetHelper" />
     <bean name="rpcMetaDataUtils" class="org.opennms.core.rpc.utils.RpcMetaDataUtils" primary="true"/>
 

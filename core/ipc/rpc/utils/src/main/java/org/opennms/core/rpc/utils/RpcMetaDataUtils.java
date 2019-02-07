@@ -52,9 +52,8 @@ public class RpcMetaDataUtils {
 
         public MetaDataMerger merge(Map<String, Map<String, String>> other) {
             for (final Map.Entry<String, Map<String, String>> entry : other.entrySet()) {
-                this.metaData
-                        .putIfAbsent(entry.getKey(), new TreeMap<>())
-                        .putAll(entry.getValue());
+                this.metaData.putIfAbsent(entry.getKey(), new TreeMap<>());
+                this.metaData.get(entry.getKey()).putAll(entry.getValue());
             }
 
             return this;
@@ -72,7 +71,7 @@ public class RpcMetaDataUtils {
 
     @Autowired(required = false)
     private NodeDao nodeDao;
-
+    
     public Map<String, Object> interpolateObjects(final int nodeId, final Map<String, Object> attributesMap, Map<String, Map<String, String>>... others) {
         return attributesMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> matchAndReplaceObject(getMetaData(nodeId, others), e.getValue())));
     }
@@ -95,12 +94,13 @@ public class RpcMetaDataUtils {
         return merger.getMetaData();
     }
 
+    @Transactional
     private static Map<String, Map<String, String>> transform(Collection<OnmsNodeMetaData> onmsMetaData) {
         final Map<String, Map<String, String>> transformed = new TreeMap<>();
 
         for (final OnmsNodeMetaData entry : onmsMetaData) {
-            transformed.putIfAbsent(entry.getContext(), new TreeMap<>())
-                    .put(entry.getKey(), entry.getValue());
+            transformed.putIfAbsent(entry.getContext(), new TreeMap<>());
+            transformed.get(entry.getContext()).put(entry.getKey(), entry.getValue());
         }
 
         return transformed;
