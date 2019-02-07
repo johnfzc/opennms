@@ -308,14 +308,14 @@ const RequisitionNode = require('../model/RequisitionNode');
      * @name NodeController:editMetaData
      * @ngdoc method
      * @methodOf NodeController
-     * @param {integer} index The index of the metaData entry to be edited
+     * @param {object} entry The metaData entry to be edited
      * @param {boolean} isNew true, if the metaData entry is new
      */
-    $scope.editMetaData = function(index, isNew) {
+    $scope.editMetaData = function(entry, isNew) {
         var form = this.nodeForm;
-        var entry = $scope.node.metaData[index];
+
         var keyBlackList = [];
-        angular.forEach($scope.node.metaData, function(entry) {
+        angular.forEach($scope.node.requisitionMetaData, function(entry) {
             keyBlackList.push(entry.key);
         });
 
@@ -335,7 +335,7 @@ const RequisitionNode = require('../model/RequisitionNode');
             form.$dirty = true;
         }, function() {
             if (isNew) {
-                $scope.node.metaData.pop();
+                $scope.node.requisitionMetaData.pop();
             }
         });
     };
@@ -346,11 +346,11 @@ const RequisitionNode = require('../model/RequisitionNode');
      * @name NodeController:removeMetaData
      * @ngdoc method
      * @methodOf NodeController
-     * @param {integer} index The index of the metaData entry to be removed
+     * @param {object} entry The index of the metaData entry to be removed
      */
-    $scope.removeMetaData = function(index) {
-        $scope.node.metaData.splice(index, 1);
-        this.nodeForm.$dirty = true;
+    $scope.removeMetaData = function(entry) {
+      _.pull($scope.node.requisitionMetaData, entry);
+      this.nodeForm.$dirty = true;
     };
 
     /**
@@ -527,6 +527,10 @@ const RequisitionNode = require('../model/RequisitionNode');
     $scope.getPrimaryAddress = function() {
       var ip = $scope.node.getPrimaryIpAddress();
       return ip ? ip : 'N/A';
+    };
+
+    $scope.Utils = {
+      'keys': Object.keys,
     };
 
     // Initialization of the node's page for either adding a new node or editing an existing node

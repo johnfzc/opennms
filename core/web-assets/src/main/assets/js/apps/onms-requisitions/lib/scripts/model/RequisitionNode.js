@@ -4,6 +4,7 @@
 */
 
 const RequisitionInterface = require('./RequisitionInterface');
+const _ = require('lodash');
 
 // Internal function for initialization purposes
 const isEmpty = function(str) {
@@ -157,24 +158,46 @@ const RequisitionNode = function RequisitionNode(foreignSource, node, isDeployed
   self.assets = [];
 
   /**
-   * @description The array of metaData entries
+   * @description The array of requisition metaData entries
    * @ngdoc property
-   * @name RequisitionNode#metaData
+   * @name RequisitionNode#requisitionMetaData
    * @propertyOf RequisitionNode
-   * @returns {array} The metaData entries
+   * @returns {object} The requisition metaData entries
    */
-  self.metaData = [];
+  self.requisitionMetaData = [];
+
+  /**
+   * @description The array of other metaData entries
+   * @ngdoc property
+   * @name RequisitionNode#otherMetaData
+   * @propertyOf RequisitionNode
+   * @returns {object} The other metaData entries
+   */
+  self.otherMetaData = {};
 
   angular.forEach(node['interface'], function(intf) {
-    self.interfaces.push(new RequisitionInterface(intf));
+      self.interfaces.push(new RequisitionInterface(intf));
+  });
+
+  angular.forEach(node['meta-data'], function(entry) {
+    if (entry.context === 'requisition') {
+      self.requisitionMetaData.push({
+        'key': entry.key,
+        'value': entry.value,
+      });
+    } else {
+      if (!_.has(self.otherMetaData, entry.context)) {
+        self.otherMetaData[entry.context] = []
+      }
+      self.otherMetaData[entry.context].push({
+        'key': entry.key,
+        'value': entry.value,
+      });
+    }
   });
 
   angular.forEach(node['asset'], function(asset) {
     self.assets.push(asset);
-  });
-
-  angular.forEach(node['meta-data'], function(entry) {
-      self.metaData.push(entry);
   });
 
   angular.forEach(node['category'], function(category) {
@@ -242,11 +265,12 @@ const RequisitionNode = function RequisitionNode(foreignSource, node, isDeployed
    * @returns {object} the new service Object
    */
   self.addNewMetaData = function() {
-      self.metaData.push({
-          key: '',
-          value: ''
-      });
-      return self.metaData.length -1;
+    let entry = {
+        key: '',
+        value: ''
+    };
+    self.requisitionMetaData.push(entry);
+    return entry;
   };
 
   /**
@@ -348,11 +372,20 @@ const RequisitionNode = function RequisitionNode(foreignSource, node, isDeployed
       nodeObject['asset'].push(asset);
     });
 
-    angular.forEach(self.metaData, function(metaData) {
+    angular.forEach(self.requisitionMetaData, function(entry) {
       nodeObject['meta-data'].push({
-        'context': 'requisition',
-        'key': metaData.key,
-        'value': metaData.value,
+          'context': 'requisition',
+          'key': entry.key,
+          'value': entry.value,
+      });
+    });
+    angular.forEach(self.otherMetaData, function(entries, context) {
+      angular.forEach(entries, function(entry) {
+        nodeObject['meta-data'].push({
+            'context': context,
+            'key': entry.key,
+            'value': entry.value,
+        });
       });
     });
 

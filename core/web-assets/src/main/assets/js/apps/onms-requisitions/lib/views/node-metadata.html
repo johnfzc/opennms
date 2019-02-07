@@ -12,27 +12,44 @@
 <p/>
 <div class="table-responsive">
   <table class="table table-striped table-condensed">
+    <caption><strong>Context:</strong> requisition</caption>
     <thead>
       <tr>
-        <th>Key</th>
+        <th style="width: 33.33%">Key</th>
         <th>Value</th>
         <th><span class="pull-right">Actions</span></th>
       </tr>
     </thead>
     <tbody>
-      <tr ng-repeat="metaData in node.metaData">
-        <td>{{metaData.key}}</td>
-        <td>{{metaData.value}}</td>
+      <tr ng-repeat="entry in node.requisitionMetaData | orderBy:'key'">
+        <td>{{entry.key}}</td>
+        <td>{{entry.value}}</td>
         <td>
           <span class="pull-right">
-            <button type="button" class="btn btn-default btn-xs" uib-tooltip="Edit the meta data entry" ng-click="editMetaData($index)">
+            <button type="button" class="btn btn-default btn-xs" uib-tooltip="Edit the meta data entry" ng-click="editMetaData(entry)">
               <span class="glyphicon glyphicon-pencil"/>
             </button>
-            <button type="button" class="btn btn-default btn-xs" uib-tooltip="Remove the meta data entry" ng-click="removeMetaData($index)">
+            <button type="button" class="btn btn-default btn-xs" uib-tooltip="Remove the meta data entry" ng-click="removeMetaData(entry)">
               <span class="glyphicon glyphicon-trash"/>
             </button>
           </span>
         </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <table class="table table-striped table-condensed" ng-repeat="context in Utils.keys(node.otherMetaData) | orderBy">
+    <caption><strong>Context:</strong> {{context}}</caption>
+    <thead>
+      <tr>
+        <th style="width: 33.33%">Key</th>
+        <th>Value</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="entry in node.otherMetaData[context] | orderBy:'key'">
+        <td>{{entry.key}}</td>
+        <td>{{entry.value}}</td>
       </tr>
     </tbody>
   </table>
