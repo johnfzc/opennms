@@ -12,5 +12,6 @@
     <context:annotation-config />
 
     <bean name="rpcTargetHelper" class="org.opennms.core.rpc.utils.RpcTargetHelper" />
+    <bean name="metaDataUtils" class="org.opennms.core.rpc.utils.RpcMetaDataUtils" />
 
 </beans>

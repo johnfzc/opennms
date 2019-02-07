@@ -121,11 +121,13 @@ public class PollerRequestBuilderImpl implements PollerRequestBuilder {
             throw new IllegalArgumentException("Monitored service is required.");
         }
 
+        final Map<String, Object> interpolatedAttributes = client.getRpcMetaDataUtils().interpolateObjects(service.getNodeId(), attributes);
+
         final RpcTarget target = client.getRpcTargetHelper().target()
                 .withNodeId(service.getNodeId())
                 .withLocation(service.getNodeLocation())
                 .withSystemId(systemId)
-                .withServiceAttributes(attributes)
+                .withServiceAttributes(interpolatedAttributes)
                 .withLocationOverride((s) -> serviceMonitor.getEffectiveLocation(s))
                 .build();
 
@@ -139,7 +141,7 @@ public class PollerRequestBuilderImpl implements PollerRequestBuilder {
         request.setNodeLabel(service.getNodeLabel());
         request.setNodeLocation(service.getNodeLocation());
         request.setTimeToLiveMs(ttlInMs);
-        request.addAttributes(attributes);
+        request.addAttributes(interpolatedAttributes);
 
         // Retrieve the runtime attributes, which may include attributes
         // such as the agent details and other state related attributes
@@ -153,7 +155,7 @@ public class PollerRequestBuilderImpl implements PollerRequestBuilder {
             // Invoke the adapters in the same order as which they were added
             for (ServiceMonitorAdaptor adaptor : adaptors) {
                 // The adapters may update the status
-                pollStatus = adaptor.handlePollResult(service, attributes, pollStatus);
+                pollStatus = adaptor.handlePollResult(service, interpolatedAttributes, pollStatus);
             }
             results.setPollStatus(pollStatus);
             return results;

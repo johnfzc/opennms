@@ -128,6 +128,8 @@ public class DetectorRequestBuilderImpl implements DetectorRequestBuilder {
             throw new IllegalArgumentException("Detector class name is required.");
         }
 
+        final Map<String, String> interpolatedAttributes = client.getRpcMetaDataUtils().interpolateStrings(nodeId, attributes);
+
         // Retrieve the factory associated with the requested detector
         final ServiceDetectorFactory<?> factory = client.getRegistry().getDetectorFactoryByClassName(className);
         if (factory == null) {
@@ -141,11 +143,11 @@ public class DetectorRequestBuilderImpl implements DetectorRequestBuilder {
         detectorRequestDTO.setSystemId(systemId);
         detectorRequestDTO.setClassName(className);
         detectorRequestDTO.setAddress(address);
-        detectorRequestDTO.addDetectorAttributes(attributes);
+        detectorRequestDTO.addDetectorAttributes(interpolatedAttributes);
 
         // Attempt to extract the port from the list of attributes
         Integer port = null;
-        final String portString = attributes.get(PORT);
+        final String portString = interpolatedAttributes.get(PORT);
         if (portString != null) {
             try {
                 port = Integer.parseInt(portString);
@@ -155,7 +157,7 @@ public class DetectorRequestBuilderImpl implements DetectorRequestBuilder {
         }
 
         // Build the DetectRequest and store the runtime attributes in the DTO
-        final DetectRequest request = factory.buildRequest(location, address, port, attributes);
+        final DetectRequest request = factory.buildRequest(location, address, port, interpolatedAttributes);
         detectorRequestDTO.addRuntimeAttributes(request.getRuntimeAttributes());
 
         // Execute the request

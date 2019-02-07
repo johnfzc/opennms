@@ -112,11 +112,13 @@ public class CollectorRequestBuilderImpl implements CollectorRequestBuilder {
             throw new IllegalArgumentException("Agent is required.");
         }
 
+        final Map<String, Object> interpolatedAttributes = client.getRpcMetaDataUtils().interpolateObjects(agent.getNodeId(), attributes);
+
         final RpcTarget target = client.getRpcTargetHelper().target()
                 .withNodeId(agent.getNodeId())
                 .withLocation(agent.getLocationName())
                 .withSystemId(systemId)
-                .withServiceAttributes(attributes)
+                .withServiceAttributes(interpolatedAttributes)
                 .withLocationOverride((s) -> serviceCollector.getEffectiveLocation(s))
                 .build();
 
@@ -131,9 +133,9 @@ public class CollectorRequestBuilderImpl implements CollectorRequestBuilder {
         // Retrieve the runtime attributes, which may include attributes
         // such as the agent details and other state related attributes
         // which should be included in the request
-        final Map<String, Object> runtimeAttributes = serviceCollector.getRuntimeAttributes(agent, attributes);
+        final Map<String, Object> runtimeAttributes = serviceCollector.getRuntimeAttributes(agent, interpolatedAttributes);
         final Map<String, Object> allAttributes = new HashMap<>();
-        allAttributes.putAll(attributes);
+        allAttributes.putAll(interpolatedAttributes);
         allAttributes.putAll(runtimeAttributes);
 
         // The runtime attributes may include objects which need to be marshaled.
