@@ -1,0 +1,19 @@
+=== Meta Data assigned to Nodes
+
+A requisition can contain arbitrary meta data for each node it contains.
+The meta data is assigned to the node and consists of a context, a key and a value.
+The context is used to group values and give them a defined meaning whereas the is used to address a specific value.
+
+Each context is managed by a different component of {opennms-product-name}.
+The only context exposed for direct manipulation by the user is called `requisition` and can be edited in the requisition interface.
+All other contexts my be created and used by other provisioning adapters.
+
+While provisioning a node, the meta data from the requisition is transferred to the database.
+
+==== Using the meta data
+The meta data con be used to dynamically configure service monitoring, performance data collection, and service detection.
+The available meta data entries can be referenced in the parameters using the link:#ga-mate-dsl[Mate-DSL].
+
+==== User defined contexts
+If there is a requirement to add more contexts not managed by {opennms-product-name}, the context name must be prefixed by `X-`.
+Any third-party software must take care to choose a context name which is unique enough to not conflict with other software.

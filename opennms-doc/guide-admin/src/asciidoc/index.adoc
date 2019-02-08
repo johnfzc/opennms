@@ -212,6 +212,7 @@ include::text/provisioning/getting-started.adoc[]
 include::text/provisioning/import-handler.adoc[]
 include::text/provisioning/examples.adoc[]
 include::text/provisioning/adapters.adoc[]
+include::text/provisioning/meta-data.adoc[]
 include::text/provisioning/integration.adoc[]
 include::text/provisioning/single-node.adoc[]
 include::text/provisioning/fine-grained.adoc[]
@@ -388,3 +389,7 @@ include::text/kafka-producer/kafka-producer.adoc[]
 [[ga-alarm-correlation]]
 == Alarm Correlation
 include::text/alarm-correlation/situation-feedback.adoc[]
+
+[[ga-mate-dsl]]
+== Mate-DSL
+include::text/mate-dsl.adoc[]
