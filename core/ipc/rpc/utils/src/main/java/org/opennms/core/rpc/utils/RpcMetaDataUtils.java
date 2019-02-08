@@ -73,7 +73,7 @@ public class RpcMetaDataUtils {
     @Autowired(required = false)
     private NodeDao nodeDao;
 
-    @Autowired
+    @Autowired(required = false)
     private TransactionTemplate transactionTemplate;
 
     public Map<String, Object> interpolateObjects(final int nodeId, final Map<String, Object> attributesMap, Map<String, Map<String, String>>... others) {
