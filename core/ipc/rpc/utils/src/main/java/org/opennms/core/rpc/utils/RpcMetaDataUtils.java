@@ -76,24 +76,27 @@ public class RpcMetaDataUtils {
     @Autowired(required = false)
     private TransactionTemplate transactionTemplate;
 
-    public Map<String, Object> interpolateObjects(final int nodeId, final Map<String, Object> attributesMap, Map<String, Map<String, String>>... others) {
+    public Map<String, Object> interpolateObjects(final Integer nodeId, final Map<String, Object> attributesMap, Map<String, Map<String, String>>... others) {
         return attributesMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> matchAndReplaceObject(getMetaData(nodeId, others), e.getValue())));
     }
 
-    public Map<String, String> interpolateStrings(final int nodeId, final Map<String, String> attributesMap, Map<String, Map<String, String>>... others) {
+    public Map<String, String> interpolateStrings(final Integer nodeId, final Map<String, String> attributesMap, Map<String, Map<String, String>>... others) {
         return attributesMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> matchAndReplaceString(getMetaData(nodeId, others), e.getValue())));
     }
 
-    public Map<String, Map<String, String>> getMetaData(final int nodeId, Map<String, Map<String, String>>... others) {
+    public Map<String, Map<String, String>> getMetaData(final Integer nodeId, Map<String, Map<String, String>>... others) {
         final MetaDataMerger merger = new MetaDataMerger();
 
-        transactionTemplate.execute((tx) -> {
-            final OnmsNode onmsNode = nodeDao.get(nodeId);
-            if (onmsNode != null) {
-                merger.merge(transform(onmsNode.getMetaData()));
-            }
-            return null;
-        });
+        if (nodeId != null) {
+            transactionTemplate.execute((tx) -> {
+                final OnmsNode onmsNode = nodeDao.get(nodeId);
+                if (onmsNode != null) {
+                    merger.merge(transform(onmsNode.getMetaData()));
+                }
+                return null;
+            });
+        }
+        
         Arrays.stream(others).forEachOrdered(merger::merge);
 
         return merger.getMetaData();
