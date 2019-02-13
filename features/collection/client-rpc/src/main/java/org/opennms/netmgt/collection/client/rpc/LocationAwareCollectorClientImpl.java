@@ -96,4 +96,8 @@ public class LocationAwareCollectorClientImpl implements LocationAwareCollectorC
     public RpcMetaDataUtils getRpcMetaDataUtils() {
         return rpcMetaDataUtils;
     }
+
+    public void setRpcMetaDataUtils(final RpcMetaDataUtils rpcMetaDataUtils) {
+        this.rpcMetaDataUtils = Objects.requireNonNull(rpcMetaDataUtils);
+    }
 }
