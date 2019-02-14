@@ -26,8 +26,9 @@
  *     http://www.opennms.com/
  *******************************************************************************/
 
-package org.opennms.core.rpc.utils;
+package org.opennms.core.rpc.utils.mate;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -36,24 +37,18 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class RpcMetaDataUtilsTest {
-    final Map<String, Map<String, String>> metaData = new TreeMap<>();
+    final Map<ContextKey, String> metaData = new HashMap<>();
 
     @Before
     public void setUp() {
-        addMetaData("ctx1", "key1", "val1");
-        addMetaData("ctx1", "key2", "val2");
-        addMetaData("ctx2", "key3", "val3");
-        addMetaData("ctx2", "key4", "val4");
-    }
-
-    private void addMetaData(final String context, final String key, final String value) {
-        metaData.putIfAbsent(context, new TreeMap<>());
-        metaData.get(context).put(key, value);
+        metaData.put(new ContextKey("ctx1", "key1"), "val1");
+        metaData.put(new ContextKey("ctx1", "key2"), "val2");
+        metaData.put(new ContextKey("ctx2", "key3"), "val3");
+        metaData.put(new ContextKey("ctx2", "key4"), "val4");
     }
 
     @Test
     public void testMetaDataInterpolation() {
-        final RpcMetaDataUtils rpcMetaDataUtils = new RpcMetaDataUtils();
         final Map<String, Object> attributes = new TreeMap<>();
 
         attributes.put("attribute1", "aaa${ctx1:key1|ctx2:key2|default}bbb");
@@ -67,7 +62,7 @@ public class RpcMetaDataUtilsTest {
         attributes.put("attribute9", "aaa${ctx1:key4|${nodeLabel}}bbb");
         attributes.put("attribute10", "aaa${abc}bbb");
 
-        final Map<String, Object> interpolatedAttributes = rpcMetaDataUtils.matchAndReplaceMetaData(metaData, attributes);
+        final Map<String, Object> interpolatedAttributes = Interpolator.interpolateObjects(attributes, new SimpleScope(this.metaData));
 
         Assert.assertEquals(attributes.size(), interpolatedAttributes.size());
         Assert.assertEquals("aaaval1bbb", interpolatedAttributes.get("attribute1"));

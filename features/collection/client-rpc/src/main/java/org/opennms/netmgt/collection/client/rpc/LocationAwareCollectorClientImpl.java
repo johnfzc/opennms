@@ -32,7 +32,8 @@ import java.util.Objects;
 
 import org.opennms.core.rpc.api.RpcClient;
 import org.opennms.core.rpc.api.RpcClientFactory;
-import org.opennms.core.rpc.utils.RpcMetaDataUtils;
+import org.opennms.core.rpc.utils.mate.EntityScopeProvider;
+import org.opennms.core.rpc.utils.mate.Interpolator;
 import org.opennms.core.rpc.utils.RpcTargetHelper;
 import org.opennms.netmgt.collection.api.CollectorRequestBuilder;
 import org.opennms.netmgt.collection.api.LocationAwareCollectorClient;
@@ -52,7 +53,7 @@ public class LocationAwareCollectorClientImpl implements LocationAwareCollectorC
     private RpcTargetHelper rpcTargetHelper;
 
     @Autowired
-    private RpcMetaDataUtils rpcMetaDataUtils;
+    private EntityScopeProvider entityScopeProvider;
 
     private RpcClient<CollectorRequestDTO, CollectorResponseDTO> delegate;
 
@@ -93,11 +94,11 @@ public class LocationAwareCollectorClientImpl implements LocationAwareCollectorC
         this.rpcTargetHelper = rpcTargetHelper;
     }
 
-    public RpcMetaDataUtils getRpcMetaDataUtils() {
-        return rpcMetaDataUtils;
+    public EntityScopeProvider getEntityScopeProvider() {
+        return this.entityScopeProvider;
     }
 
-    public void setRpcMetaDataUtils(final RpcMetaDataUtils rpcMetaDataUtils) {
-        this.rpcMetaDataUtils = Objects.requireNonNull(rpcMetaDataUtils);
+    public void setEntityScopeProvider(final EntityScopeProvider entityScopeProvider) {
+        this.entityScopeProvider = entityScopeProvider;
     }
 }

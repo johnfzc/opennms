@@ -32,7 +32,7 @@ import java.util.Objects;
 
 import org.opennms.core.rpc.api.RpcClient;
 import org.opennms.core.rpc.api.RpcClientFactory;
-import org.opennms.core.rpc.utils.RpcMetaDataUtils;
+import org.opennms.core.rpc.utils.mate.EntityScopeProvider;
 import org.opennms.core.rpc.utils.RpcTargetHelper;
 import org.opennms.netmgt.poller.LocationAwarePollerClient;
 import org.opennms.netmgt.poller.PollerRequestBuilder;
@@ -55,7 +55,7 @@ public class LocationAwarePollerClientImpl implements LocationAwarePollerClient,
     private RpcTargetHelper rpcTargetHelper;
 
     @Autowired
-    private RpcMetaDataUtils rpcMetaDataUtils;
+    private EntityScopeProvider entityScopeProvider;
 
     private RpcClient<PollerRequestDTO, PollerResponseDTO> delegate;
 
@@ -96,11 +96,11 @@ public class LocationAwarePollerClientImpl implements LocationAwarePollerClient,
         this.rpcTargetHelper = rpcTargetHelper;
     }
 
-    public RpcMetaDataUtils getRpcMetaDataUtils() {
-        return rpcMetaDataUtils;
+    public EntityScopeProvider getEntityScopeProvider() {
+        return this.entityScopeProvider;
     }
 
-    public void setRpcMetaDataUtils(RpcMetaDataUtils rpcMetaDataUtils) {
-        this.rpcMetaDataUtils = rpcMetaDataUtils;
+    public void setEntityScopeProvider(final EntityScopeProvider entityScopeProvider) {
+        this.entityScopeProvider = entityScopeProvider;
     }
 }

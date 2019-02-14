@@ -35,6 +35,8 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import org.opennms.core.rpc.api.RpcTarget;
+import org.opennms.core.rpc.utils.mate.Interpolator;
+import org.opennms.core.rpc.utils.mate.Scope;
 import org.opennms.netmgt.poller.MonitoredService;
 import org.opennms.netmgt.poller.PollStatus;
 import org.opennms.netmgt.poller.PollerRequestBuilder;
@@ -121,7 +123,8 @@ public class PollerRequestBuilderImpl implements PollerRequestBuilder {
             throw new IllegalArgumentException("Monitored service is required.");
         }
 
-        final Map<String, Object> interpolatedAttributes = client.getRpcMetaDataUtils().interpolateObjects(service.getNodeId(), attributes);
+        final Scope nodeScope = this.client.getEntityScopeProvider().getScopeForNode(service.getNodeId());
+        final Map<String, Object> interpolatedAttributes = Interpolator.interpolateObjects(attributes, nodeScope);
 
         final RpcTarget target = client.getRpcTargetHelper().target()
                 .withNodeId(service.getNodeId())

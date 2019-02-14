@@ -33,6 +33,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
+import org.opennms.core.rpc.utils.mate.Interpolator;
+import org.opennms.core.rpc.utils.mate.Scope;
 import org.opennms.netmgt.provision.DetectRequest;
 import org.opennms.netmgt.provision.DetectorRequestBuilder;
 import org.opennms.netmgt.provision.ServiceDetector;
@@ -128,7 +130,8 @@ public class DetectorRequestBuilderImpl implements DetectorRequestBuilder {
             throw new IllegalArgumentException("Detector class name is required.");
         }
 
-        final Map<String, String> interpolatedAttributes = client.getRpcMetaDataUtils().interpolateStrings(nodeId, attributes);
+        final Scope nodeScope = this.client.getEntityScopeProvider().getScopeForNode(nodeId);
+        final Map<String, String> interpolatedAttributes = Interpolator.interpolateStrings(attributes, nodeScope);
 
         // Retrieve the factory associated with the requested detector
         final ServiceDetectorFactory<?> factory = client.getRegistry().getDetectorFactoryByClassName(className);

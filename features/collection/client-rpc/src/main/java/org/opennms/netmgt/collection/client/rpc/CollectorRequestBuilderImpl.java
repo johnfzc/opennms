@@ -34,6 +34,8 @@ import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 import org.opennms.core.rpc.api.RpcTarget;
+import org.opennms.core.rpc.utils.mate.Interpolator;
+import org.opennms.core.rpc.utils.mate.Scope;
 import org.opennms.netmgt.collection.api.CollectionAgent;
 import org.opennms.netmgt.collection.api.CollectionSet;
 import org.opennms.netmgt.collection.api.CollectorRequestBuilder;
@@ -112,7 +114,8 @@ public class CollectorRequestBuilderImpl implements CollectorRequestBuilder {
             throw new IllegalArgumentException("Agent is required.");
         }
 
-        final Map<String, Object> interpolatedAttributes = client.getRpcMetaDataUtils().interpolateObjects(agent.getNodeId(), attributes);
+        final Scope nodeScope = this.client.getEntityScopeProvider().getScopeForNode(agent.getNodeId());
+        final Map<String, Object> interpolatedAttributes = Interpolator.interpolateObjects(attributes, nodeScope);
 
         final RpcTarget target = client.getRpcTargetHelper().target()
                 .withNodeId(agent.getNodeId())
