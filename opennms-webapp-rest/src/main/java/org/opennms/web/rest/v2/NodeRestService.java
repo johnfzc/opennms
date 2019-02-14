@@ -60,8 +60,8 @@ import org.opennms.netmgt.dao.api.NodeDao;
 import org.opennms.netmgt.events.api.EventProxy;
 import org.opennms.netmgt.model.OnmsNode;
 import org.opennms.netmgt.model.OnmsNodeList;
-import org.opennms.netmgt.model.OnmsNodeMetaData;
-import org.opennms.netmgt.model.OnmsNodeMetaDataList;
+import org.opennms.netmgt.model.OnmsMetaData;
+import org.opennms.netmgt.model.OnmsMetaDataList;
 import org.opennms.netmgt.model.events.EventUtils;
 import org.opennms.netmgt.model.monitoringLocations.OnmsMonitoringLocation;
 import org.opennms.netmgt.xml.event.Event;
@@ -274,27 +274,27 @@ public class NodeRestService extends AbstractDaoRestService<OnmsNode,SearchBean,
     @GET
     @Path("{nodeCriteria}/metaData")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public JaxbListWrapper<OnmsNodeMetaData> getMetaData(@PathParam("nodeCriteria") String nodeCriteria) {
+    public JaxbListWrapper<OnmsMetaData> getMetaData(@PathParam("nodeCriteria") String nodeCriteria) {
         final OnmsNode node = getDao().get(nodeCriteria);
 
         if (node == null) {
             throw getException(Status.BAD_REQUEST, "getMetaData: Can't find node " + nodeCriteria);
         }
 
-        return new OnmsNodeMetaDataList(node.getMetaData());
+        return new OnmsMetaDataList(node.getMetaData());
     }
 
     @GET
     @Path("{nodeCriteria}/metaData/{context}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public JaxbListWrapper<OnmsNodeMetaData> getMetaData(@PathParam("nodeCriteria") String nodeCriteria, @PathParam("context") String context) {
+    public JaxbListWrapper<OnmsMetaData> getMetaData(@PathParam("nodeCriteria") String nodeCriteria, @PathParam("context") String context) {
         final OnmsNode node = getDao().get(nodeCriteria);
 
         if (node == null) {
             throw getException(Status.BAD_REQUEST, "getMetaData: Can't find node " + nodeCriteria);
         }
 
-        return new OnmsNodeMetaDataList(node.getMetaData().stream()
+        return new OnmsMetaDataList(node.getMetaData().stream()
                 .filter(e -> context.equals(e.getContext()))
                 .collect(Collectors.toList()));
     }
@@ -302,14 +302,14 @@ public class NodeRestService extends AbstractDaoRestService<OnmsNode,SearchBean,
     @GET
     @Path("{nodeCriteria}/metaData/{context}/{key}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public JaxbListWrapper<OnmsNodeMetaData> getMetaData(@PathParam("nodeCriteria") String nodeCriteria, @PathParam("context") String context, @PathParam("key") String key) {
+    public JaxbListWrapper<OnmsMetaData> getMetaData(@PathParam("nodeCriteria") String nodeCriteria, @PathParam("context") String context, @PathParam("key") String key) {
         final OnmsNode node = getDao().get(nodeCriteria);
 
         if (node == null) {
             throw getException(Status.BAD_REQUEST, "getMetaData: Can't find node " + nodeCriteria);
         }
 
-        return new OnmsNodeMetaDataList(node.getMetaData().stream()
+        return new OnmsMetaDataList(node.getMetaData().stream()
                 .filter(e -> context.equals(e.getContext()) && key.equals(e.getKey()))
                 .collect(Collectors.toList()));
     }
@@ -353,7 +353,7 @@ public class NodeRestService extends AbstractDaoRestService<OnmsNode,SearchBean,
     @POST
     @Path("{nodeCriteria}/metaData")
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response postMetaData(@PathParam("nodeCriteria") String nodeCriteria, OnmsNodeMetaData entity) {
+    public Response postMetaData(@PathParam("nodeCriteria") String nodeCriteria, OnmsMetaData entity) {
         writeLock();
         try {
             final OnmsNode node = getDao().get(nodeCriteria);

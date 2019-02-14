@@ -35,7 +35,6 @@ import static org.junit.Assert.fail;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
@@ -64,7 +63,7 @@ import org.opennms.netmgt.dao.api.NodeDao;
 import org.opennms.netmgt.model.OnmsIpInterface;
 import org.opennms.netmgt.model.OnmsMonitoredService;
 import org.opennms.netmgt.model.OnmsNode;
-import org.opennms.netmgt.model.OnmsNodeMetaData;
+import org.opennms.netmgt.model.OnmsMetaData;
 import org.opennms.netmgt.model.OnmsSnmpInterface;
 import org.opennms.netmgt.model.PathElement;
 import org.opennms.netmgt.model.monitoringLocations.OnmsMonitoringLocation;
@@ -706,7 +705,7 @@ public class NodeDaoIT implements InitializingBean {
 
         m_transTemplate.execute((ts) -> {
             OnmsNode node = getNodeDao().get(nodeId);
-            node.setMetaData(Arrays.asList(new OnmsNodeMetaData("ctx", "foo", "bar")));
+            node.setMetaData(Arrays.asList(new OnmsMetaData("ctx", "foo", "bar")));
             getNodeDao().update(node);
             getNodeDao().flush();
 

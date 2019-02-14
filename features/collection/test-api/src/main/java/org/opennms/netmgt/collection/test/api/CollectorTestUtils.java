@@ -32,8 +32,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.net.InetAddress;
 import java.util.concurrent.Executors;
 
+import org.opennms.core.rpc.mock.MockEntityScopeProvider;
 import org.opennms.core.rpc.mock.MockRpcClientFactory;
 import org.opennms.core.rpc.utils.RpcTargetHelper;
 import org.opennms.core.rpc.utils.mate.EmptyScope;
@@ -73,12 +75,7 @@ public abstract class CollectorTestUtils {
         final LocationAwareCollectorClientImpl locationAwareCollectorClient = new LocationAwareCollectorClientImpl(rpcClientFactory);
         locationAwareCollectorClient.setRpcModule(collectorClientRpcModule);
         locationAwareCollectorClient.setRpcTargetHelper(new RpcTargetHelper());
-        locationAwareCollectorClient.setEntityScopeProvider(new EntityScopeProvider() {
-            @Override
-            public Scope getScopeForNode(Integer nodeId) {
-                return EmptyScope.EMPTY;
-            }
-        });
+        locationAwareCollectorClient.setEntityScopeProvider(new MockEntityScopeProvider());
         locationAwareCollectorClient.afterPropertiesSet();
         return locationAwareCollectorClient;
     }

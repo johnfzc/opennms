@@ -37,7 +37,7 @@
             org.opennms.netmgt.model.OnmsNode,
             org.opennms.web.api.Authentication,
             org.opennms.web.element.*,
-            org.opennms.netmgt.model.OnmsNodeMetaData"
+            org.opennms.netmgt.model.OnmsMetaData"
 %>
 
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -66,7 +66,7 @@
 
             int switchColumns = metaData.size() / 2 + 1;
 
-            for(final OnmsNodeMetaData onmsNodeMetaData : node.getMetaData()) {
+            for(final OnmsMetaData onmsNodeMetaData : node.getMetaData()) {
                 metaData.putIfAbsent(onmsNodeMetaData.getContext(), new TreeMap<String, String>());
                 metaData.get(onmsNodeMetaData.getContext()).put(onmsNodeMetaData.getKey(), onmsNodeMetaData.getValue());
             }

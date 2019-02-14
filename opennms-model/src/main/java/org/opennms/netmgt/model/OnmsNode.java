@@ -196,7 +196,7 @@ public class OnmsNode extends OnmsEntity implements Serializable, Comparable<Onm
 
     private PathElement m_pathElement;
 
-    private List<OnmsNodeMetaData> m_metaData = new ArrayList<>();
+    private List<OnmsMetaData> m_metaData = new ArrayList<>();
 
     /**
      * <p>
@@ -971,12 +971,12 @@ public class OnmsNode extends OnmsEntity implements Serializable, Comparable<Onm
     @JsonIgnore
     @XmlTransient
     @ElementCollection(fetch = FetchType.LAZY)
-    @CollectionTable(name="node_metadata", joinColumns = @JoinColumn(name = "nodeid"))
-    public List<OnmsNodeMetaData> getMetaData() {
+    @CollectionTable(name="node_metadata", joinColumns = @JoinColumn(name = "id"))
+    public List<OnmsMetaData> getMetaData() {
         return m_metaData;
     }
 
-    public void setMetaData(final List<OnmsNodeMetaData> metaData) {
+    public void setMetaData(final List<OnmsMetaData> metaData) {
         m_metaData = metaData;
     }
 
@@ -985,7 +985,7 @@ public class OnmsNode extends OnmsEntity implements Serializable, Comparable<Onm
         Objects.requireNonNull(key);
         Objects.requireNonNull(value);
 
-        final Optional<OnmsNodeMetaData> entry = getMetaData().stream()
+        final Optional<OnmsMetaData> entry = getMetaData().stream()
             .filter(m -> m.getContext().equals(context))
             .filter(m -> m.getKey().equals(key))
             .findFirst();
@@ -994,17 +994,17 @@ public class OnmsNode extends OnmsEntity implements Serializable, Comparable<Onm
         if (entry.isPresent()) {
             entry.get().setValue(value);
         } else {
-            getMetaData().add(new OnmsNodeMetaData(context, key, value));
+            getMetaData().add(new OnmsMetaData(context, key, value));
         }
     }
 
     public void removeMetaData(final String context, final String key) {
         Objects.requireNonNull(context);
         Objects.requireNonNull(key);
-        final Iterator<OnmsNodeMetaData> iterator = getMetaData().iterator();
+        final Iterator<OnmsMetaData> iterator = getMetaData().iterator();
 
         while (iterator.hasNext()) {
-            final OnmsNodeMetaData onmsNodeMetaData = iterator.next();
+            final OnmsMetaData onmsNodeMetaData = iterator.next();
 
             if (context.equals(onmsNodeMetaData.getContext()) && key.equals(onmsNodeMetaData.getKey())) {
                 iterator.remove();
@@ -1014,10 +1014,10 @@ public class OnmsNode extends OnmsEntity implements Serializable, Comparable<Onm
 
     public void removeMetaData(final String context) {
         Objects.requireNonNull(context);
-        final Iterator<OnmsNodeMetaData> iterator = getMetaData().iterator();
+        final Iterator<OnmsMetaData> iterator = getMetaData().iterator();
 
         while (iterator.hasNext()) {
-            final OnmsNodeMetaData onmsNodeMetaData = iterator.next();
+            final OnmsMetaData onmsNodeMetaData = iterator.next();
 
             if (context.equals(onmsNodeMetaData.getContext())) {
                 iterator.remove();

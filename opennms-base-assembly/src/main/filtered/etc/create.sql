@@ -44,8 +44,10 @@ drop table usersNotified cascade;
 drop table notifications cascade;
 drop table outages cascade;
 drop table ifServices cascade;
+drop table ifServices_metadata cascade;
 drop table snmpInterface cascade;
 drop table ipInterface cascade;
+drop table ipInterface_metadata cascade;
 drop table alarms cascade;
 drop table memos cascade;
 drop table node_metadata cascade;
@@ -1259,13 +1261,33 @@ create index assets_nodeid_idx on assets(nodeid);
 CREATE INDEX assets_an_idx ON assets(assetNumber);
 
 CREATE TABLE node_metadata (
-    nodeid integer NOT NULL,
+    id integer NOT NULL,
     context text NOT NULL,
     key text NOT NULL,
     value text NOT NULL,
 
-    CONSTRAINT node_metadata_pkey PRIMARY KEY (nodeid, context, key),
-    CONSTRAINT fk_node_metadata_nodeid FOREIGN KEY (nodeid) references node ON DELETE CASCADE
+    CONSTRAINT node_metadata_pkey PRIMARY KEY (id, context, key),
+    CONSTRAINT fk_node_metadata_id FOREIGN KEY (nodeid) references node ON DELETE CASCADE
+);
+
+CREATE TABLE ipInterface_metadata (
+    id integer NOT NULL,
+    context text NOT NULL,
+    key text NOT NULL,
+    value text NOT NULL,
+
+    CONSTRAINT ipInterface_metadata_pkey PRIMARY KEY (id, context, key),
+    CONSTRAINT fk_ipInterface_metadata_id FOREIGN KEY (id) references ipInterface ON DELETE CASCADE
+);
+
+CREATE TABLE ifServices_metadata (
+    id integer NOT NULL,
+    context text NOT NULL,
+    key text NOT NULL,
+    value text NOT NULL,
+
+    CONSTRAINT ifServices_metadata_pkey PRIMARY KEY (id, context, key),
+    CONSTRAINT fk_ifServices_metadata_id FOREIGN KEY (id) references ifServices ON DELETE CASCADE
 );
 
 --########################################################################

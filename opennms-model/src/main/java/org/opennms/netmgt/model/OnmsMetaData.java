@@ -37,7 +37,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name="meta-data")
 @Embeddable
-public class OnmsNodeMetaData implements Serializable {
+public class OnmsMetaData implements Serializable {
 
     private static final long serialVersionUID = 3529745790145204662L;
 
@@ -45,10 +45,10 @@ public class OnmsNodeMetaData implements Serializable {
     private String key;
     private String value;
 
-    public OnmsNodeMetaData() {
+    public OnmsMetaData() {
     }
 
-    public OnmsNodeMetaData(String context, String key, String value) {
+    public OnmsMetaData(String context, String key, String value) {
         this.context = Objects.requireNonNull(context);
         this.key = Objects.requireNonNull(key);
         this.value = Objects.requireNonNull(value);

@@ -28,22 +28,33 @@
 
 package org.opennms.core.rpc.utils.mate;
 
+import java.net.InetAddress;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.opennms.netmgt.dao.api.IpInterfaceDao;
+import org.opennms.netmgt.dao.api.MonitoredServiceDao;
 import org.opennms.netmgt.dao.api.NodeDao;
+import org.opennms.netmgt.model.OnmsIpInterface;
+import org.opennms.netmgt.model.OnmsMonitoredService;
 import org.opennms.netmgt.model.OnmsNode;
-import org.opennms.netmgt.model.OnmsNodeMetaData;
+import org.opennms.netmgt.model.OnmsMetaData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.support.TransactionTemplate;
+
+import com.google.common.base.Strings;
 
 public class EntityScopeProviderImpl implements EntityScopeProvider {
 
     @Autowired
     private NodeDao nodeDao;
+
+    @Autowired
+    private IpInterfaceDao ipInterfaceDao;
+
+    @Autowired
+    private MonitoredServiceDao monitoredServiceDao;
 
     @Autowired
     private TransactionTemplate transactions;
@@ -68,7 +79,49 @@ public class EntityScopeProviderImpl implements EntityScopeProvider {
         return metaDataScope;
     }
 
-    private static Map<ContextKey, String> transform(Collection<OnmsNodeMetaData> metaData) {
+    @Override
+    public Scope getScopeForInterface(final Integer nodeId, final String ipAddress) {
+        if (nodeId == null || Strings.isNullOrEmpty(ipAddress)) {
+            return EmptyScope.EMPTY;
+        }
+
+        final Scope metaDataScope = this.transactions.execute((tx) -> {
+            final OnmsIpInterface ipInterface = this.ipInterfaceDao.findByNodeIdAndIpAddress(nodeId, ipAddress);
+            if (ipInterface == null) {
+                return EmptyScope.EMPTY;
+            }
+
+            return new SimpleScope(transform(ipInterface.getMetaData()));
+        });
+
+        // TODO: Add context "interface" {id, ip, ...}
+
+        return metaDataScope;
+    }
+
+
+
+    @Override
+    public Scope getScopeForService(final Integer nodeId, final InetAddress ipAddress, final String serviceName) {
+        if (nodeId == null || ipAddress == null || Strings.isNullOrEmpty(serviceName)) {
+            return EmptyScope.EMPTY;
+        }
+
+        final Scope metaDataScope = this.transactions.execute((tx) -> {
+            final OnmsMonitoredService monitoredService = this.monitoredServiceDao.get(nodeId, ipAddress, serviceName);
+            if (monitoredService == null) {
+                return EmptyScope.EMPTY;
+            }
+
+            return new SimpleScope(transform(monitoredService.getMetaData()));
+        });
+
+        // TODO: Add context "service" {id, name, ...}
+
+        return metaDataScope;
+    }
+
+    private static Map<ContextKey, String> transform(Collection<OnmsMetaData> metaData) {
         return metaData.stream().collect(Collectors.toMap(
                         e -> new ContextKey(e.getContext(), e.getKey()),
                         e -> e.getValue()));

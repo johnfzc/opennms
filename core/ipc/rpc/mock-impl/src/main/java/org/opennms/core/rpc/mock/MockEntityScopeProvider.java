@@ -26,38 +26,27 @@
  *     http://www.opennms.com/
  *******************************************************************************/
 
-package org.opennms.netmgt.model;
+package org.opennms.core.rpc.mock;
 
-import java.util.Collection;
-import java.util.List;
+import java.net.InetAddress;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import org.opennms.core.rpc.utils.mate.EmptyScope;
+import org.opennms.core.rpc.utils.mate.EntityScopeProvider;
+import org.opennms.core.rpc.utils.mate.Scope;
 
-import org.codehaus.jackson.annotate.JsonProperty;
-import org.codehaus.jackson.map.annotate.JsonRootName;
-import org.opennms.core.config.api.JaxbListWrapper;
-
-@XmlRootElement(name = "meta-data-list")
-@XmlAccessorType(XmlAccessType.NONE)
-@JsonRootName("meta-data-list")
-public class OnmsNodeMetaDataList extends JaxbListWrapper<OnmsNodeMetaData> {
-    private static final long serialVersionUID = 1L;
-
-    public OnmsNodeMetaDataList() { super(); }
-    public OnmsNodeMetaDataList(final Collection<? extends OnmsNodeMetaData> onmsNodeMetaData) {
-        super(onmsNodeMetaData);
+public final class MockEntityScopeProvider implements EntityScopeProvider {
+    @Override
+    public Scope getScopeForNode(final Integer nodeId) {
+        return EmptyScope.EMPTY;
     }
 
-    @XmlElement(name="meta-data")
-    @JsonProperty(" meta-data")
-    public List<OnmsNodeMetaData> getObjects() {
-        return super.getObjects();
+    @Override
+    public Scope getScopeForInterface(final Integer nodeId, final String ipAddress) {
+        return EmptyScope.EMPTY;
     }
 
-    public List<OnmsNodeMetaData> getMetaDataList() {
-        return getObjects();
+    @Override
+    public Scope getScopeForService(final Integer nodeId, final InetAddress ipAddress, final String serviceName) {
+        return EmptyScope.EMPTY;
     }
 }

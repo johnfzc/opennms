@@ -26,14 +26,38 @@
  *     http://www.opennms.com/
  *******************************************************************************/
 
-package org.opennms.core.rpc.utils.mate;
+package org.opennms.netmgt.model;
 
-import java.net.InetAddress;
+import java.util.Collection;
+import java.util.List;
 
-public interface EntityScopeProvider {
-    Scope getScopeForNode(final Integer nodeId);
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
-    Scope getScopeForInterface(final Integer nodeId, final String ipAddress);
+import org.codehaus.jackson.annotate.JsonProperty;
+import org.codehaus.jackson.map.annotate.JsonRootName;
+import org.opennms.core.config.api.JaxbListWrapper;
 
-    Scope getScopeForService(final Integer nodeId, final InetAddress ipAddress, final String serviceName);
+@XmlRootElement(name = "meta-data-list")
+@XmlAccessorType(XmlAccessType.NONE)
+@JsonRootName("meta-data-list")
+public class OnmsMetaDataList extends JaxbListWrapper<OnmsMetaData> {
+    private static final long serialVersionUID = 1L;
+
+    public OnmsMetaDataList() { super(); }
+    public OnmsMetaDataList(final Collection<? extends OnmsMetaData> onmsNodeMetaData) {
+        super(onmsNodeMetaData);
+    }
+
+    @XmlElement(name="meta-data")
+    @JsonProperty(" meta-data")
+    public List<OnmsMetaData> getObjects() {
+        return super.getObjects();
+    }
+
+    public List<OnmsMetaData> getMetaDataList() {
+        return getObjects();
+    }
 }
