@@ -1267,7 +1267,7 @@ CREATE TABLE node_metadata (
     value text NOT NULL,
 
     CONSTRAINT node_metadata_pkey PRIMARY KEY (id, context, key),
-    CONSTRAINT fk_node_metadata_id FOREIGN KEY (nodeid) references node ON DELETE CASCADE
+    CONSTRAINT fk_node_metadata_id FOREIGN KEY (id) references node (nodeid) ON DELETE CASCADE
 );
 
 CREATE TABLE ipInterface_metadata (
