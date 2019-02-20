@@ -1534,9 +1534,9 @@ public class OnmsNode extends OnmsEntity implements Serializable, Comparable<Onm
      *
      * @param scannedNode a {@link org.opennms.netmgt.model.OnmsNode} object.
      */
-    public void mergeMetaData(OnmsNode scannedNode) {
-        if (!getMetaData().equals(scannedNode.getMetaData())) {
-            setMetaData(scannedNode.getMetaData());
+    public void mergeMetaData(OnmsNode scanned) {
+        if (!getMetaData().equals(scanned.getMetaData())) {
+            setMetaData(scanned.getMetaData());
         }
     }
 

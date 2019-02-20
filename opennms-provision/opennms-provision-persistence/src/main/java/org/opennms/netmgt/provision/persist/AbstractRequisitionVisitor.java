@@ -111,11 +111,31 @@ public abstract class AbstractRequisitionVisitor implements RequisitionVisitor {
 
     /** {@inheritDoc} */
     @Override
-    public void visitMetaData(OnmsMetaDataRequisition metaDataReq) {
+    public void visitNodeMetaData(OnmsNodeMetaDataRequisition metaDataReq) {
     }
 
     /** {@inheritDoc} */
     @Override
-    public void completeMetaData(OnmsMetaDataRequisition metaDataReq) {
+    public void completeNodeMetaData(OnmsNodeMetaDataRequisition metaDataReq) {
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void visitInterfaceMetaData(OnmsInterfaceMetaDataRequisition metaDataReq) {
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void completeInterfaceMetaData(OnmsInterfaceMetaDataRequisition metaDataReq) {
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void visitServiceMetaData(OnmsServiceMetaDataRequisition metaDataReq) {
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void completeServiceMetaData(OnmsServiceMetaDataRequisition metaDataReq) {
     }
 }

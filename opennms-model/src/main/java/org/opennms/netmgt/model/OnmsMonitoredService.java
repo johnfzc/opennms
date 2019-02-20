@@ -654,6 +654,12 @@ public class OnmsMonitoredService extends OnmsEntity implements Serializable, Co
 
     }
 
+    public void mergeMetaData(OnmsMonitoredService scanned) {
+        if (!getMetaData().equals(scanned.getMetaData())) {
+            setMetaData(scanned.getMetaData());
+        }
+    }
+
 	private boolean hasNewStatusValue(String newStatus, String oldStatus) 
 	{
 		/*

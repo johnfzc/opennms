@@ -104,12 +104,14 @@ import org.opennms.netmgt.provision.persist.ForeignSourceRepository;
 import org.opennms.netmgt.provision.persist.ForeignSourceRepositoryException;
 import org.opennms.netmgt.provision.persist.MockForeignSourceRepository;
 import org.opennms.netmgt.provision.persist.OnmsAssetRequisition;
+import org.opennms.netmgt.provision.persist.OnmsInterfaceMetaDataRequisition;
 import org.opennms.netmgt.provision.persist.OnmsIpInterfaceRequisition;
-import org.opennms.netmgt.provision.persist.OnmsMetaDataRequisition;
+import org.opennms.netmgt.provision.persist.OnmsNodeMetaDataRequisition;
 import org.opennms.netmgt.provision.persist.OnmsMonitoredServiceRequisition;
 import org.opennms.netmgt.provision.persist.OnmsNodeCategoryRequisition;
 import org.opennms.netmgt.provision.persist.OnmsNodeRequisition;
 import org.opennms.netmgt.provision.persist.OnmsServiceCategoryRequisition;
+import org.opennms.netmgt.provision.persist.OnmsServiceMetaDataRequisition;
 import org.opennms.netmgt.provision.persist.RequisitionVisitor;
 import org.opennms.netmgt.provision.persist.foreignsource.ForeignSource;
 import org.opennms.netmgt.provision.persist.foreignsource.PluginConfig;
@@ -1892,8 +1894,12 @@ public class ProvisionerIT extends ProvisioningITCase implements InitializingBea
         protected int m_assetCompleted;
         protected List<OnmsNodeRequisition> m_nodes = new ArrayList<>();
         protected List<OnmsIpInterfaceRequisition> m_ifaces = new ArrayList<>();
-        protected int m_metaDataCount;
-        protected int m_metaDataCompleted;
+        protected int m_nodeMetaDataCount;
+        protected int m_nodeMetaDataCompleted;
+        protected int m_interfaceMetaDataCount;
+        protected int m_interfaceMetaDataCompleted;
+        protected int m_serviceMetaDataCount;
+        protected int m_serviceMetaDataCompleted;
 
         public List<OnmsNodeRequisition> getNodes() {
             return m_nodes;
@@ -1959,12 +1965,28 @@ public class ProvisionerIT extends ProvisioningITCase implements InitializingBea
             return m_assetCompleted;
         }
 
-        public int getMetaDataCount() {
-            return m_metaDataCount;
+        public int getNodeMetaDataCount() {
+            return m_nodeMetaDataCount;
         }
 
-        public int getMetaDataCompletedCount() {
-            return m_metaDataCompleted;
+        public int getNodeMetaDataCompletedCount() {
+            return m_nodeMetaDataCompleted;
+        }
+
+        public int getInterfaceMetaDataCount() {
+            return m_interfaceMetaDataCount;
+        }
+
+        public int getInterfaceMetaDataCompletedCount() {
+            return m_interfaceMetaDataCompleted;
+        }
+
+        public int getServiceMetaDataCount() {
+            return m_serviceMetaDataCount;
+        }
+
+        public int getServiceMetaDataCompletedCount() {
+            return m_serviceMetaDataCompleted;
         }
 
         @Override
@@ -2021,8 +2043,12 @@ public class ProvisionerIT extends ProvisioningITCase implements InitializingBea
             .add("serviceCategoryCompletedCount", getServiceCategoryCompletedCount())
             .add("assetCount", getAssetCount())
             .add("assetCompletedCount", getAssetCompletedCount())
-            .add("metaDataCount", getMetaDataCount())
-            .add("metaDataCompletedCount", getMetaDataCompletedCount())
+            .add("nodeMetaDataCount", getNodeMetaDataCount())
+            .add("nodeMetaDataCompletedCount", getNodeMetaDataCompletedCount())
+            .add("interfaceMetaDataCount", getInterfaceMetaDataCount())
+            .add("interfaceMetaDataCompletedCount", getInterfaceMetaDataCompletedCount())
+            .add("serviceMetaDataCount", getServiceMetaDataCount())
+            .add("serviceMetaDataCompletedCount", getServiceMetaDataCompletedCount())
             .toString();
         }
 
@@ -2062,13 +2088,33 @@ public class ProvisionerIT extends ProvisioningITCase implements InitializingBea
         }
 
         @Override
-        public void visitMetaData(OnmsMetaDataRequisition metaDataReq) {
-            m_metaDataCount++;
+        public void visitNodeMetaData(OnmsNodeMetaDataRequisition metaDataReq) {
+            m_nodeMetaDataCount++;
         }
 
         @Override
-        public void completeMetaData(OnmsMetaDataRequisition metaDataReq) {
-            m_metaDataCompleted++;
+        public void completeNodeMetaData(OnmsNodeMetaDataRequisition metaDataReq) {
+            m_nodeMetaDataCompleted++;
+        }
+
+        @Override
+        public void visitInterfaceMetaData(OnmsInterfaceMetaDataRequisition metaDataReq) {
+            m_interfaceMetaDataCount++;
+        }
+
+        @Override
+        public void completeInterfaceMetaData(OnmsInterfaceMetaDataRequisition metaDataReq) {
+            m_interfaceMetaDataCompleted++;
+        }
+
+        @Override
+        public void visitServiceMetaData(OnmsServiceMetaDataRequisition metaDataReq) {
+            m_serviceMetaDataCount++;
+        }
+
+        @Override
+        public void completeServiceMetaData(OnmsServiceMetaDataRequisition metaDataReq) {
+            m_serviceMetaDataCompleted++;
         }
     }
 

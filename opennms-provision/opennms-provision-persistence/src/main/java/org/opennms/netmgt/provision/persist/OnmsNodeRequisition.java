@@ -30,6 +30,7 @@ package org.opennms.netmgt.provision.persist;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.opennms.netmgt.model.NetworkBuilder;
 import org.opennms.netmgt.model.NetworkBuilder.InterfaceBuilder;
@@ -56,7 +57,7 @@ public class OnmsNodeRequisition {
     private String m_foreignSource;
     private RequisitionNode m_node;
     private List<OnmsAssetRequisition> m_assetReqs;
-    private List<OnmsMetaDataRequisition> m_metaDataReqs;
+    private List<OnmsNodeMetaDataRequisition> m_metaDataReqs;
     private List<OnmsIpInterfaceRequisition> m_ifaceReqs;
     private List<OnmsNodeCategoryRequisition> m_categoryReqs;
 
@@ -92,12 +93,10 @@ public class OnmsNodeRequisition {
         return reqs;
     }
 
-    private List<OnmsMetaDataRequisition> constructMetaDataRequistions() {
-        final List<OnmsMetaDataRequisition> reqs = new ArrayList<>(m_node.getMetaData().size());
-        for(final RequisitionMetaData metaData : m_node.getMetaData()) {
-            reqs.add(new OnmsMetaDataRequisition(metaData));
-        }
-        return reqs;
+    private List<OnmsNodeMetaDataRequisition> constructMetaDataRequistions() {
+        return m_node.getMetaData().stream()
+                .map(OnmsNodeMetaDataRequisition::new)
+                .collect(Collectors.toList());
     }
 
     private List<OnmsIpInterfaceRequisition> constructIpInterfaceRequistions() {
@@ -135,9 +134,9 @@ public class OnmsNodeRequisition {
         for(final OnmsAssetRequisition assetReq : m_assetReqs) {
             assetReq.visit(visitor);
         }
-        for(final OnmsMetaDataRequisition metaDataReq : m_metaDataReqs) {
-            metaDataReq.visit(visitor);
-        }
+
+        m_metaDataReqs.forEach(r -> r.visit(visitor));
+
         visitor.completeNode(this);
     }
     
@@ -154,8 +153,18 @@ public class OnmsNodeRequisition {
         }
 
         @Override
-        public void visitMetaData(OnmsMetaDataRequisition metaDataReq) {
-            bldr.setMetaDataEntry(metaDataReq.getContext(), metaDataReq.getKey(), metaDataReq.getValue());
+        public void visitNodeMetaData(OnmsNodeMetaDataRequisition metaDataReq) {
+            bldr.setNodeMetaDataEntry(metaDataReq.getContext(), metaDataReq.getKey(), metaDataReq.getValue());
+        }
+
+        @Override
+        public void visitInterfaceMetaData(OnmsInterfaceMetaDataRequisition metaDataReq) {
+            bldr.setInterfaceMetaDataEntry(metaDataReq.getContext(), metaDataReq.getKey(), metaDataReq.getValue());
+        }
+
+        @Override
+        public void visitServiceMetaData(OnmsServiceMetaDataRequisition metaDataReq) {
+            bldr.setServiceMetaDataEntry(metaDataReq.getContext(), metaDataReq.getKey(), metaDataReq.getValue());
         }
 
         @Override

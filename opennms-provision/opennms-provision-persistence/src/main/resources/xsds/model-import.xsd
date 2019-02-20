@@ -93,6 +93,7 @@
       <sequence>
         <element ref="this:monitored-service" minOccurs="0" maxOccurs="unbounded" />
         <element ref="this:category" minOccurs="0" maxOccurs="unbounded" />
+        <element ref="this:meta-data" minOccurs="0" maxOccurs="unbounded" />
       </sequence>
       <attribute name="ip-addr" type="string" use="required" />
       <attribute name="descr" use="optional" >
@@ -137,8 +138,8 @@
     </annotation>
     <complexType>
       <sequence>
-        <element ref="this:category" minOccurs="0" maxOccurs="unbounded">
-        </element>
+        <element ref="this:category" minOccurs="0" maxOccurs="unbounded" />
+        <element ref="this:meta-data" minOccurs="0" maxOccurs="unbounded" />
       </sequence>
       <attribute name="service-name" type="string" use="required" />
     </complexType>

@@ -665,6 +665,7 @@ public class OnmsIpInterface extends OnmsEntity implements Serializable {
             else {
                 // otherwice update the service attributes
                 svc.mergeServiceAttributes(imported);
+                svc.mergeMetaData(imported);
             }
             
             // mark the service is updated
@@ -677,6 +678,12 @@ public class OnmsIpInterface extends OnmsEntity implements Serializable {
             svc.setIpInterface(this);
             getMonitoredServices().add(svc);
             svc.visit(new AddEventVisitor(eventForwarder));
+        }
+    }
+
+    public void mergeMetaData(OnmsIpInterface scanned) {
+        if (!getMetaData().equals(scanned.getMetaData())) {
+            setMetaData(scanned.getMetaData());
         }
     }
 
@@ -719,6 +726,7 @@ public class OnmsIpInterface extends OnmsEntity implements Serializable {
         updateSnmpInterface(scannedIface);
         mergeInterfaceAttributes(scannedIface);
         mergeMonitoredServices(scannedIface, eventForwarder, deleteMissing);
+        mergeMetaData(scannedIface);
     }
 
     @Transient

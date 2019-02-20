@@ -32,11 +32,11 @@ import java.util.Objects;
 
 import org.opennms.netmgt.provision.persist.requisition.RequisitionMetaData;
 
-public class OnmsMetaDataRequisition {
+public class OnmsInterfaceMetaDataRequisition {
 
     private RequisitionMetaData metaData;
 
-    public OnmsMetaDataRequisition(RequisitionMetaData metaData) {
+    public OnmsInterfaceMetaDataRequisition(RequisitionMetaData metaData) {
         this.metaData = Objects.requireNonNull(metaData);
     }
 
@@ -57,8 +57,8 @@ public class OnmsMetaDataRequisition {
     }
 
     public void visit(RequisitionVisitor visitor) {
-        visitor.visitMetaData(this);
-        visitor.completeMetaData(this);
+        visitor.visitInterfaceMetaData(this);
+        visitor.completeInterfaceMetaData(this);
     }
 
 }
