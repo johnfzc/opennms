@@ -43,75 +43,75 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
 <%
-    final OnmsNode node = ElementUtil.getNodeByParams(request, getServletContext());
+    final OnmsNode entity = ElementUtil.getNodeByParams(request, getServletContext());
 
-    String nodeBreadCrumb = "<a href='element/node.jsp?node=" + node.getId()  + "'>Node</a>";
+    String nodeBreadCrumb = "<a href='element/node.jsp?node=" + entity.getId()  + "'>Node</a>";
 %>
 
 <jsp:include page="/includes/bootstrap.jsp" flush="false" >
     <jsp:param name="title" value="Metadata" />
-    <jsp:param name="headTitle" value="<%= node.getLabel() %>" />
-    <jsp:param name="headTitle" value="Metadata" />
+    <jsp:param name="headTitle" value="<%= entity.getLabel() %>" />
+    <jsp:param name="headTitle" value="Meta-Data" />
     <jsp:param name="breadcrumb" value="<a href='element/index.jsp'>Search</a>" />
     <jsp:param name="breadcrumb" value="<%= nodeBreadCrumb %>" />
-    <jsp:param name="breadcrumb" value="Metadata" />
+    <jsp:param name="breadcrumb" value="Meta-Data" />
 </jsp:include>
 
-<h4>Metadata for Node: <%= node.getLabel() %></h4>
+<h4>Meta-Data for Node: <strong><%= entity.getLabel() %></strong></h4>
 
 <div class="row">
-    <div class="col-md-6"> <!-- content-right -->
+    <div class="col-md-12">
         <%
             final Map<String, Map<String, String>> metaData = new TreeMap<>();
 
-            int switchColumns = metaData.size() / 2 + 1;
-
-            for(final OnmsMetaData onmsNodeMetaData : node.getMetaData()) {
+            for(final OnmsMetaData onmsNodeMetaData : entity.getMetaData()) {
                 metaData.putIfAbsent(onmsNodeMetaData.getContext(), new TreeMap<String, String>());
                 metaData.get(onmsNodeMetaData.getContext()).put(onmsNodeMetaData.getKey(), onmsNodeMetaData.getValue());
             }
 
             if (metaData.size()>0) {
+        %>
+        <div class="card-columns mb-3">
+        <%
                 for(final Map.Entry<String, Map<String, String>> entry1 : metaData.entrySet()) {
         %>
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title">Context <%= entry1.getKey() %></h3>
-            </div>
-            <!-- general info box -->
-            <table class="table table-condensed">
-        <%
-                    for(final Map.Entry<String, String> entry2 : entry1.getValue().entrySet()) {
-                        String value = entry2.getValue();
+            <div class="card">
+                <div class="card-header">
+                    Context <strong><%= entry1.getKey() %></strong>
+                </div>
+                <!-- general info box -->
+                <div class="card-body p-0">
+                    <table class="table table-sm table-striped mb-0">
+                <%
+                            for(final Map.Entry<String, String> entry2 : entry1.getValue().entrySet()) {
+                                String value = entry2.getValue();
 
-                        if (!request.isUserInRole(Authentication.ROLE_ADMIN) && entry2.getKey().matches(".*([pP]assword|[sS]ecret).*")) {
-                            value = "***";
-                        }
-        %>
-                <tr>
-                    <th width="30%"><%= entry2.getKey() %></th>
-                    <td><%= value %></td>
-                </tr>
+                                if (!request.isUserInRole(Authentication.ROLE_ADMIN) && entry2.getKey().matches(".*([pP]assword|[sS]ecret).*")) {
+                                    value = "***";
+                                }
+                %>
+                        <tr>
+                            <th width="30%"><%= entry2.getKey() %></th>
+                            <td><%= value %></td>
+                        </tr>
+                <%
+                            }
+                %>
+                    </table>
+                </div>
+            </div> <!-- panel -->
         <%
-                    }
-        %>
-            </table>
-        </div> <!-- panel -->
-        <%
-                    if (switchColumns-- == 0) {
-        %>
-    </div> <!-- content-left -->
-    <div class="col-md-6">
-        <%
-                    }
                 }
+        %>
+        </div> <!-- card-columns -->
+        <%
             } else {
         %>
-        <b>No Metadata available for this node.</b><br/><br/>
+        <strong>No Metadata available for this node.</strong><br/><br/>
         <%
             }
         %>
-    </div> <!-- content-right -->
+    </div> <!-- col -->
 </div> <!-- row -->
 
 <jsp:include page="/includes/bootstrap-footer.jsp" flush="false" />
