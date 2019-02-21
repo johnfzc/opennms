@@ -50,7 +50,7 @@ public class MetadataPageIT extends OpenNMSSeleniumTestCase {
     @Before
     public void setUp() throws Exception {
         createUnpriviledgedUser();
-
+        LOG.debug("Creating node...");
         final String node =
                 "<node type=\"A\" label=\"TestNode\" foreignSource=\"SmokeTests\" foreignId=\"TestNode\">" +
                 "<labelSource>H</labelSource>" +
@@ -62,11 +62,24 @@ public class MetadataPageIT extends OpenNMSSeleniumTestCase {
                 "<createTime>2019-02-05T13:25:00.123-04:00</createTime>" +
                 "<lastCapsdPoll>2019-02-05T13:20:00.456-04:00</lastCapsdPoll>" +
                 "</node>";
-
-        LOG.debug("Creating node...");
         sendPost("rest/nodes", node, 201);
         LOG.debug("Node created!");
-
+        LOG.debug("Creating an interface...");
+        final String ipInterface = "<ipInterface isManaged=\"M\" snmpPrimary=\"P\">" +
+                "<ipAddress>10.10.10.10</ipAddress>" +
+                "<hostName>test-machine1.local</hostName>" +
+                "</ipInterface>";
+        sendPost("rest/nodes/SmokeTests:TestNode/ipinterfaces", ipInterface, 201);
+        LOG.debug("Interface created!");
+        LOG.debug("Creating a service...");
+        final String service = "<service down=\"false\" status=\"A\" statusLong=\"Managed\">\n" +
+                "<applications/>\n" +
+                "<serviceType id=\"1\">\n" +
+                "<name>ICMP</name>\n" +
+                "</serviceType>\n" +
+                "</service>";
+        sendPost("rest/nodes/SmokeTests:TestNode/ipinterfaces/10.10.10.10/services", service, 201);
+        LOG.debug("Service created!");
         LOG.debug("Creating meta-data for node...");
         sendPut("api/v2/nodes/SmokeTests:TestNode/metaData/contextA/keyA1/valueA1", "", 204);
         sendPut("api/v2/nodes/SmokeTests:TestNode/metaData/contextA/keyA2/valueA2", "", 204);
@@ -77,7 +90,13 @@ public class MetadataPageIT extends OpenNMSSeleniumTestCase {
         sendPut("api/v2/nodes/SmokeTests:TestNode/metaData/contextC/keypasswordC1/valueC1", "", 204);
         sendPut("api/v2/nodes/SmokeTests:TestNode/metaData/contextC/keyPasswordC2/valueC2", "", 204);
         sendPut("api/v2/nodes/SmokeTests:TestNode/metaData/contextC/keyC3/valueC3", "", 204);
-        LOG.debug("Meta-data created!");
+        LOG.debug("Meta-data for node created!");
+        LOG.debug("Creating meta-data for interface...");
+        sendPut("api/v2/nodes/SmokeTests:TestNode/ipinterfaces/10.10.10.10/metaData/contextD/keyD1/valueD1", "", 204);
+        LOG.debug("Meta-data for interface created!");
+        LOG.debug("Creating meta-data for service...");
+        sendPut("api/v2/nodes/SmokeTests:TestNode/ipinterfaces/10.10.10.10/services/ICMP/metaData/contextE/keyE1/valueE1", "", 204);
+        LOG.debug("Meta-data for service created!");
     }
 
     @After
@@ -198,6 +217,26 @@ public class MetadataPageIT extends OpenNMSSeleniumTestCase {
         waitUntil(pageContainsText("valueC1"));
         waitUntil(pageContainsText("valueC2"));
         waitUntil(pageContainsText("valueC3"));
+
+        // visit the node's page to click the interface 10.10.10.10
+        m_driver.get(getBaseUrl() + "opennms/element/node.jsp?node=SmokeTests:TestNode");
+        findElementByLink("10.10.10.10").click();
+        // go to the metadata page
+        findElementByLink("Meta-Data").click();
+        // checking interface-level values
+        waitUntil(pageContainsText("Context contextD"));
+        waitUntil(pageContainsText("keyD1"));
+        waitUntil(pageContainsText("valueD1"));
+
+        // visit the node's page to click the service ICMP
+        m_driver.get(getBaseUrl() + "opennms/element/node.jsp?node=SmokeTests:TestNode");
+        findElementByLink("ICMP").click();
+        // go to the metadata page
+        findElementByLink("Meta-Data").click();
+        // checking service-level values
+        waitUntil(pageContainsText("Context contextE"));
+        waitUntil(pageContainsText("keyE1"));
+        waitUntil(pageContainsText("valueE1"));
 
         // login with the unpriviledged user
         loginUnpriviledgedUser();
