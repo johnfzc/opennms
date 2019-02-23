@@ -143,6 +143,12 @@ public class LinkdTopologyProviderTestIT {
         test(TopologyGenerator.Protocol.ospf);
     }
 
+    @Test
+    @Transactional
+    public void testBridgeBridge() throws Exception {
+        test(TopologyGenerator.Protocol.bridgeBridge);
+    }
+
     private void test(TopologyGenerator.Protocol protocol) throws OnmsTopologyException{
         testAmounts(protocol);
         testLinkingBetweenNodes(protocol);
