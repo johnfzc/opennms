@@ -257,12 +257,12 @@ const RequisitionNode = function RequisitionNode(foreignSource, node, isDeployed
   };
 
   /**
-   * @description Adds a new metaData entry to the node
+   * @description Adds a new meta-data entry to the node
    *
    * @name RequisitionNode:addNewMetaData
    * @ngdoc method
    * @methodOf RequisitionNode
-   * @returns {object} the new service Object
+   * @returns {object} the new meta-data Object
    */
   self.addNewMetaData = function() {
     let entry = {
@@ -357,12 +357,47 @@ const RequisitionNode = function RequisitionNode(foreignSource, node, isDeployed
         'descr': intf.description,
         'snmp-primary': intf.snmpPrimary,
         'status': (intf.status || intf.status === 'managed') ? '1' : '3',
+        'meta-data': [],
         'monitored-service': []
       };
-      angular.forEach(intf.services, function(service) {
-        interfaceObject['monitored-service'].push({
-          'service-name': service.name
+      angular.forEach(intf.requisitionMetaData, function(entry) {
+        interfaceObject['meta-data'].push({
+          'context': 'requisition',
+          'key': entry.key,
+          'value': entry.value,
         });
+      });
+      angular.forEach(intf.otherMetaData, function(entries, context) {
+        angular.forEach(entries, function(entry) {
+          interfaceObject['meta-data'].push({
+            'context': context,
+            'key': entry.key,
+            'value': entry.value,
+          });
+        });
+      });
+      angular.forEach(intf.services, function(service) {
+        var serviceObject = {
+          'service-name': service.name,
+          'meta-data': [],
+        };
+        angular.forEach(service.requisitionMetaData, function(entry) {
+          serviceObject['meta-data'].push({
+            'context': 'requisition',
+            'key': entry.key,
+            'value': entry.value,
+          });
+        });
+        angular.forEach(service.otherMetaData, function(entries, context) {
+          angular.forEach(entries, function(entry) {
+            serviceObject['meta-data'].push({
+              'context': context,
+              'key': entry.key,
+              'value': entry.value,
+            });
+          });
+        });
+        interfaceObject['monitored-service'].push(serviceObject);
       });
 
       nodeObject['interface'].push(interfaceObject);

@@ -9,6 +9,8 @@ require('../services/Requisitions');
 
   'use strict';
 
+  const serviceView = require('../../views/service.html');
+
   angular.module('onms-requisitions')
 
   /**
@@ -26,7 +28,7 @@ require('../services/Requisitions');
   *
   * @description The controller for manage the modal dialog for add/edit IP interfaces of requisitioned nodes
   */
-  .controller('InterfaceController', ['$scope', '$uibModalInstance', 'RequisitionsService', 'foreignSource', 'foreignId', 'requisitionInterface', 'ipBlackList', function($scope, $uibModalInstance, RequisitionsService, foreignSource, foreignId, requisitionInterface, ipBlackList) {
+  .controller('InterfaceController', ['$scope', '$uibModalInstance', '$uibModal', 'RequisitionsService', 'foreignSource', 'foreignId', 'requisitionInterface', 'ipBlackList', function($scope, $uibModalInstance, $uibModal, RequisitionsService, foreignSource, foreignId, requisitionInterface, ipBlackList) {
 
     /**
     * @description The foreign source (a.k.a the name of the requisition).
@@ -115,6 +117,29 @@ require('../services/Requisitions');
     };
 
     /**
+     * @description Adds a new empty meta-data entry
+     *
+     * @name InterfaceController:addMetaData
+     * @ngdoc method
+     * @methodOf InterfaceController
+     */
+    $scope.addMetaData = function() {
+      $scope.requisitionInterface.requisitionMetaData.push({ key: '', value: '' });
+    };
+
+    /**
+     * @description Removes a meta-data entry
+     *
+     * @name InterfaceController:removeMetaData
+     * @ngdoc method
+     * @methodOf InterfaceController
+     * @param {integer} index The index of the meta-data entry to remove
+     */
+    $scope.removeMetaData= function(index) {
+      $scope.requisitionInterface.requisitionMetaData.splice(index, 1);
+    };
+
+    /**
     * @description Adds a new empty service
     *
     * @name InterfaceController:addService
@@ -135,6 +160,34 @@ require('../services/Requisitions');
     */
     $scope.removeService = function(index) {
       $scope.requisitionInterface.services.splice(index, 1);
+    };
+
+    /**
+     * @description Edits a service
+     *
+     * @name InterfaceController:editService
+     * @ngdoc method
+     * @methodOf InterfaceController
+     * @param {integer} index The index of the service to edit
+     */
+    $scope.editService = function(index) {
+      var form = this.intfForm;
+      var serviceToEdit = $scope.requisitionInterface.services[index];
+
+      var modalInstance = $uibModal.open({
+        backdrop: 'static',
+        keyboard: false,
+        controller: 'ServiceController',
+        templateUrl: serviceView,
+        resolve: {
+          service: function() { return angular.copy(serviceToEdit); },
+        }
+      });
+
+      modalInstance.result.then(function(result) {
+        angular.copy(result, serviceToEdit);
+        form.$dirty = true;
+      });
     };
 
     /**

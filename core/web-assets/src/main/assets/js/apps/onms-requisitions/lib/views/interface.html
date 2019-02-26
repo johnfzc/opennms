@@ -25,20 +25,49 @@
              ng-class="{ 'is-invalid' : intfForm.snmpPrimary.$invalid }">
       <p ng-show="intfForm.snmpPrimary.$invalid" class="invalid-feedback">A valid SNMP Primary Flag is required.</p>
     </div>
-    <label ng-show="requisitionInterface.services.length > 0">Services</label>
-    <ng-form name="serviceForm" ng-repeat="service in requisitionInterface.services">
-      <div class="form-group">
-        <div class="input-group">
-          <div class="input-group-prepend">
-            <div class="input-group-text">
-              <i class="fa fa-pencil"></i>
-            </div>
+
+    <hr>
+    <div class="clearfix">
+      <button type="button" class="btn btn-sm btn-secondary pull-right" id="add-metadata" ng-click="addMetaData()" ng-disabled="intfForm.$invalid">Add Meta Data</button>
+      <h4>Meta Data</h4>
+    </div>
+    <ng-form name="metadataForm" ng-repeat="entry in requisitionInterface.requisitionMetaData">
+      <div class="form-group" style="margin-bottom: 0.5rem;">
+        <div class="input-group input-group-sm">
+          <input class="form-control" type="text" name="metadata-key" placeholder="Meta Data Key"
+                 ng-model="entry.key" typeahead-editable="true" typeahead-min-length="0" required
+                 ng-class="{ 'is-invalid' : metadataForm.key.$invalid }">
+          <div class="input-group-prepend input-group-append">
+            <div class="input-group-text" style="border-radius: 0; border-left: 0; border-right: 0">=</div>
           </div>
+          <input class="form-control" type="text" name="metadata-value" placeholder="Meta Data Value"
+                 ng-model="entry.value" typeahead-editable="true" typeahead-min-length="0" required
+                 ng-class="{ 'is-invalid' : metadataForm.value.$invalid }">
+          <span class="input-group-append">
+            <button class="btn btn-secondary" type="button" ng-click="removeMetaData($index)">
+              <i class="fa fa-trash"></i>
+            </button>
+          </span>
+        </div>
+      </div>
+    </ng-form>
+
+    <hr>
+    <div class="clearfix">
+      <button type="button" class="btn btn-sm btn-secondary pull-right" id="add-service" ng-click="addService()" ng-disabled="intfForm.$invalid">Add Service</button>
+      <h4>Services</h4>
+    </div>
+    <ng-form name="serviceForm" ng-repeat="service in requisitionInterface.services">
+      <div class="form-group" style="margin-bottom: 0.5rem;">
+        <div class="input-group input-group-sm">
           <input class="form-control" type="text" name="serviceName" placeholder="Service Name (choose one from the list or type a custom text for a new one)"
                  ng-model="service.name" typeahead-editable="true" typeahead-min-length="0"
                  uib-typeahead="service for service in getAvailableServices() | filter:$viewValue | orderBy:'toString()'" required valid-service
                  ng-class="{ 'is-invalid' : serviceForm.serviceName.$invalid }">
           <span class="input-group-append">
+            <button class="btn btn-secondary" type="button" ng-click="editService($index)">
+              <i class="fa fa-pencil"></i>
+            </button>
             <button class="btn btn-secondary" type="button" ng-click="removeService($index)">
               <i class="fa fa-trash"></i>
             </button>
@@ -51,7 +80,6 @@
 </div>
 
 <div class="modal-footer">
-  <button type="button" class="btn btn-secondary" id="add-service" ng-click="addService()" ng-disabled="intfForm.$invalid">Add Service</button>
   <button type="button" class="btn btn-primary" id="save-interface" ng-click="save()" ng-disabled="intfForm.$invalid">Save</button>
   <button type="button" class="btn btn-secondary" id="cancel-interface" ng-click="cancel()">Cancel</button>
 </div>
