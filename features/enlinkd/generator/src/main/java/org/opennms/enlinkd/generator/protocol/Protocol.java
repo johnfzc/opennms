@@ -124,7 +124,7 @@ public abstract class Protocol<Element> {
         return interfaces;
     }
 
-    private OnmsSnmpInterface createSnmpInterface(int ifIndex, OnmsNode node) {
+    protected OnmsSnmpInterface createSnmpInterface(int ifIndex, OnmsNode node) {
         OnmsSnmpInterface onmsSnmpInterface = new OnmsSnmpInterface();
         onmsSnmpInterface.setNode(node);
         onmsSnmpInterface.setIfIndex(ifIndex);
@@ -147,7 +147,7 @@ public abstract class Protocol<Element> {
         return interfaces;
     }
 
-    private OnmsIpInterface createIpInterface(OnmsSnmpInterface snmp, InetAddress inetAddress) {
+    protected OnmsIpInterface createIpInterface(OnmsSnmpInterface snmp, InetAddress inetAddress) {
         OnmsIpInterface ip = new OnmsIpInterface();
         ip.setSnmpInterface(snmp);
         ip.setIpLastCapsdPoll(new Date());
