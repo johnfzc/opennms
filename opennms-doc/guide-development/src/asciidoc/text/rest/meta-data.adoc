@@ -1,47 +1,8 @@
-=== Meta-Data
+==== Meta Data
 
-OpenNMS supports the assignment of arbitrary meta-data to nodes, interfaces and services.
-The meta-data is a simple triple of strings containing a context, a key and the associated value. There can be an arbitrary number of meta-data elements assigned to each node, each interface and each service.
-The only restriction is, that the tuple of context and key must be unique in the element to which they are associated.
+The actual Meta-Data of nodes, interfaces and services can be queried, added, modified or deleted via ReST endpoints.
 
-The meta-data is associated to the model during provisioning. Therefore, the provisioning model allows to specify the meta-data for nodes, interfaces and services, too. During provisioning, the meta-data is copied to the model and persisted in the database.
-
-The node, interface and service detail pages allow to view the associated meta-data. Furthermore, the Requisition UI allows to edit the meta-data defined in a requisition. The edit function in the Requisition UI is limited to only edit the context called `requisition` by intention. All other contexts are reserved for future use by other provisioning-adapters and similar applications like asset-data.
-
-The meta-data can be used to enrich the configuration of detectors, pollers and data-collections. They all use a small DSL which allows to access the meta-data associated to the elements they are working on. The syntax of this allows the usage of patterns like `${context:key|context_fallback:key_fallback|...|default}` in each parameter. The DSL allows to provide scopes which will determine the resolution order. The last scope will be queried first. If the scope does not contain the queried (context,key) tuple, the next one will be queried.
-
-To test parameter expansion, there is also a Karaf shell command which interpolates a string containing a pattern to the final result:
-[source]
-----
-$ ssh -p 8101 admin@localhost
-...
-admin@opennms> meta:test -n 1 -i 192.168.0.100 -s ICMP '${fruits:apple|fruits:banana|vegetables:tomato|blue}'
----
-Meta-Data for node (id=1)
-fruits:
-  apple='green'
-  banana='yellow'
-vegetables:
-  tomato='red'
----
-Meta-Data for interface (ipAddress=192.168.0.100):
-fruits:
-  apple='brown'
----
-Meta-Data for service (name=ICMP):
-fruits:
-  apple='red'
----
-Input: '${fruits:apple|fruits:banana|vegetables:tomato|blue}'
-Output: 'red'
-admin@opennms>
-----
-
-==== ReST endpoints
-
-Meta-Data can also be queried, added, modified or deleted via ReST endpoints. Please refer to the following tables for the details:
-
-===== GETs (Reading Meta-Data)
+===== GETs (Reading Meta Data)
 
 [options="header", cols="5,10"]
 |===

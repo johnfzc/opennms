@@ -1,18 +1,13 @@
-=== Meta Data assigned to Nodes
+[[ga-provisioning-meta-data]]
+=== Meta-Data assigned to Nodes
+A requisition can contain arbitrary link:#ga-meta-data[meta-data] for each node, interface and service it contains.
+During provisioning, the meta-data is copied to the model and persisted in the database.
 
-A requisition can contain arbitrary meta data for each node it contains.
-The meta data is assigned to the node and consists of a context, a key and a value.
-The context is used to group values and give them a defined meaning whereas the is used to address a specific value.
+The Requisition UI allows to edit the meta-data defined in a requisition.
+The edit function in the Requisition UI is limited to only edit the context called `requisition` by intention.
+All other contexts are reserved for future use by other provisioning-adapters and similar applications like asset-data.
 
-Each context is managed by a different component of {opennms-product-name}.
-The only context exposed for direct manipulation by the user is called `requisition` and can be edited in the requisition interface.
-All other contexts my be created and used by other provisioning adapters.
-
-While provisioning a node, the meta data from the requisition is transferred to the database.
-
-==== Using the meta data
-The meta data con be used to dynamically configure service monitoring, performance data collection, and service detection.
-The available meta data entries can be referenced in the parameters using the link:#ga-mate-dsl[Mate-DSL].
+While provisioning a requisition, the meta-data from the requisition is transferred to the database and assigned to the nodes, interfaces and services accordingly.
 
 ==== User defined contexts
 If there is a requirement to add more contexts not managed by {opennms-product-name}, the context name must be prefixed by `X-`.
