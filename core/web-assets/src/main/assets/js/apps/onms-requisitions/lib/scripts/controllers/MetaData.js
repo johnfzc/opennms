@@ -14,7 +14,7 @@ require('../services/Requisitions');
   * @requires $scope Angular local scope
   * @requires $uibModalInstance Angular UI modal instance
   * @requires RequisitionsService The Requisitions Servive
-  * @requires Meta Data Node metaData entry object
+  * @requires metaData Meta-Data entry object
   * @requires metadataBlackList The black list of metaData fields
   *
   * @description The controller for manage the modal dialog for add/edit metaData entries of requisitioned nodes
@@ -32,7 +32,7 @@ require('../services/Requisitions');
     $scope.entry = entry;
 
     /**
-    * @description The black list of meta data key fields.
+    * @description The black list of meta-data key fields.
     *
     * @ngdoc property
     * @name MetaDataController#keyBlackList
@@ -42,7 +42,7 @@ require('../services/Requisitions');
     $scope.keyBlackList = keyBlackList;
 
     /**
-    * @description Saves the current meta data entry
+    * @description Saves the current meta-data entry
     *
     * @name MetaDataController:save
     * @ngdoc method

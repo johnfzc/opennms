@@ -1,8 +1,8 @@
-==== Meta Data
+==== Meta-Data
 
 The actual Meta-Data of nodes, interfaces and services can be queried, added, modified or deleted via ReST endpoints.
 
-===== GETs (Reading Meta Data)
+===== GETs (Reading Meta-Data)
 
 [options="header", cols="5,10"]
 |===

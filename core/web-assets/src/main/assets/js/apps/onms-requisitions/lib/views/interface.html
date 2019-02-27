@@ -28,19 +28,19 @@
 
     <hr>
     <div class="clearfix">
-      <button type="button" class="btn btn-sm btn-secondary pull-right" id="add-metadata" ng-click="addMetaData()" ng-disabled="intfForm.$invalid">Add Meta Data</button>
-      <h4>Meta Data</h4>
+      <button type="button" class="btn btn-sm btn-secondary pull-right" id="add-metadata" ng-click="addMetaData()" ng-disabled="intfForm.$invalid">Add Meta-Data</button>
+      <h4>Meta-Data</h4>
     </div>
     <ng-form name="metadataForm" ng-repeat="entry in requisitionInterface.requisitionMetaData">
       <div class="form-group" style="margin-bottom: 0.5rem;">
         <div class="input-group input-group-sm">
-          <input class="form-control" type="text" name="metadata-key" placeholder="Meta Data Key"
+          <input class="form-control" type="text" name="metadata-key" placeholder="Meta-Data Key"
                  ng-model="entry.key" typeahead-editable="true" typeahead-min-length="0" required
                  ng-class="{ 'is-invalid' : metadataForm.key.$invalid }">
           <div class="input-group-prepend input-group-append">
             <div class="input-group-text" style="border-radius: 0; border-left: 0; border-right: 0">=</div>
           </div>
-          <input class="form-control" type="text" name="metadata-value" placeholder="Meta Data Value"
+          <input class="form-control" type="text" name="metadata-value" placeholder="Meta-Data Value"
                  ng-model="entry.value" typeahead-editable="true" typeahead-min-length="0" required
                  ng-class="{ 'is-invalid' : metadataForm.value.$invalid }">
           <span class="input-group-append">

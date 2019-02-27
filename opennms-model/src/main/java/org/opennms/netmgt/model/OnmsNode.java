@@ -1530,7 +1530,7 @@ public class OnmsNode extends OnmsEntity implements Serializable, Comparable<Onm
     }
 
     /**
-     * Truly merges the node's meta data
+     * Truly merges the node's meta-data
      *
      * @param scannedNode a {@link org.opennms.netmgt.model.OnmsNode} object.
      */
