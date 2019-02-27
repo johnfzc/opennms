@@ -1,0 +1,95 @@
+=== Meta-Data
+
+OpenNMS supports the assignment of arbitrary meta-data to nodes, interfaces and services.
+The meta-data is a simple triple of strings containing a context, a key and the associated value. There can be an arbitrary number of meta-data elements assigned to each node, each interface and each service.
+The only restriction is, that the tuple of context and key must be unique in the element to which they are associated.
+
+The meta-data is associated to the model during provisioning. Therefore, the provisioning model allows to specify the meta-data for nodes, interfaces and services, too. During provisioning, the meta-data is copied to the model and persisted in the database.
+
+The node, interface and service detail pages allow to view the associated meta-data. Furthermore, the Requisition UI allows to edit the meta-data defined in a requisition. The edit function in the Requisition UI is limited to only edit the context called `requisition` by intention. All other contexts are reserved for future use by other provisioning-adapters and similar applications like asset-data.
+
+The meta-data can be used to enrich the configuration of detectors, pollers and data-collections. They all use a small DSL which allows to access the meta-data associated to the elements they are working on. The syntax of this allows the usage of patterns like `${context:key|context_fallback:key_fallback|...|default}` in each parameter. The DSL allows to provide scopes which will determine the resolution order. The last scope will be queried first. If the scope does not contain the queried (context,key) tuple, the next one will be queried.
+
+To test parameter expansion, there is also a Karaf shell command which interpolates a string containing a pattern to the final result:
+[source]
+----
+$ ssh -p 8101 admin@localhost
+...
+admin@opennms> meta:test -n 1 -i 192.168.0.100 -s ICMP '${fruits:apple|fruits:banana|vegetables:tomato|blue}'
+---
+Meta-Data for node (id=1)
+fruits:
+  apple='green'
+  banana='yellow'
+vegetables:
+  tomato='red'
+---
+Meta-Data for interface (ipAddress=192.168.0.100):
+fruits:
+  apple='brown'
+---
+Meta-Data for service (name=ICMP):
+fruits:
+  apple='red'
+---
+Input: '${fruits:apple|fruits:banana|vegetables:tomato|blue}'
+Output: 'red'
+admin@opennms>
+----
+
+==== ReST endpoints
+
+Meta-Data can also be queried, added, modified or deleted via ReST endpoints. Please refer to the following tables for the details:
+
+===== GETs (Reading Meta-Data)
+
+[options="header", cols="5,10"]
+|===
+| Resource                                                                                   | Description
+| `api/v2/nodes/{id}/metaData`                                                               | Get the list of meta-data associated with this node.
+| `api/v2/nodes/{id}/metaData/{context}`                                                     | Get the list of meta-data associated with this node filtered by the given context.
+| `api/v2/nodes/{id}/metaData/{context}/{key}`                                               | Get the entry for the given context and key associated with this node.
+| `api/v2/nodes/{id}/ipinterfaces/{ipInterface}/metaData`                                    | Get the list of meta-data associated with this interface.
+| `api/v2/nodes/{id}/ipinterfaces/{ipInterface}/metaData/{context}`                          | Get the list of meta-data associated with this interface filtered by the given context.
+| `api/v2/nodes/{id}/ipinterfaces/{ipInterface}/metaData/{context}/{key}`                    | Get the entry for the given context and key associated with this interface.
+| `api/v2/nodes/{id}/ipinterfaces/{ipInterface}/services/{service}/metaData`                 | Get the list of meta-data associated with this service.
+| `api/v2/nodes/{id}/ipinterfaces/{ipInterface}/services/{service}/metaData/{context}`       | Get the list of meta-data associated with this service filtered by the given context.
+| `api/v2/nodes/{id}/ipinterfaces/{ipInterface}/services/{service}/metaData/{context}/{key}` | Get the entry for the given context and key associated with this service.
+|===
+
+===== POSTs (Adding Meta-Data)
+
+POST requires XML using application/xml as its Content-Type.
+
+[options="header", cols="5,10"]
+|===
+| Resource                                                      | Description
+| `api/v2/nodes/{id}/metaData`                                  | Adds a meta-data entry to the given node.
+| `api/v2/nodes/{id}/{ipInterface}/metaData`                    | Adds a meta-data entry to the given interface.
+| `api/v2/nodes/{id}/{ipInterface}/services/{service}/metaData` | Adds a meta-data entry to the given service.
+|===
+
+[[rest-api-nodes-put]]
+
+===== PUTs (Modifying Meta-Data)
+
+[options="header", cols="5,10"]
+|===
+| Resource                                                                              | Description
+| `api/v2/nodes/{id}/metaData/{context}/{key}/{value}`                                  | Sets the given value for the node-level meta-data entry specified by the given context and key.
+| `api/v2/nodes/{id}/ipinterfaces/{ipInterface}/metaData/{context}/{key}/{value}`                    | Sets the given value for the interface-level meta-data entry specified by the given context and key.
+| `api/v2/nodes/{id}/ipinterfaces/{ipInterface}/services/{service}/metaData/{context}/{key}/{value}` | Sets the given value for the service-level meta-data entry specified by the given context and key.
+|===
+
+===== DELETEs (Removing Meta-Data)
+
+[options="header", cols="5,10"]
+|===
+| Resource                                                                      | Description
+| `api/v2/nodes/{id}/metaData/{context}`                                        | Deletes node-level meta-data with the given context.
+| `api/v2/nodes/{id}/metaData/{context}/{key}`                                  | Deletes the node-level meta-data entry for the given context and key.
+| `api/v2/nodes/{id}/ipinterfaces/{ipInterface}/metaData/{context}`                          | Deletes interface-level meta-data with the given context.
+| `api/v2/nodes/{id}/ipinterfaces/{ipInterface}/metaData/{context}/{key}`                    | Deletes the interface-level meta-data entry for the given context and key.
+| `api/v2/nodes/{id}/ipinterfaces/{ipInterface}/services/{service}/metaData/{context}`       | Deletes service-level meta-data with the given context.
+| `api/v2/nodes/{id}/ipinterfaces/{ipInterface}/services/{service}/metaData/{context}/{key}` | Deletes the service-level meta-data entry for the given context and key.
+|===

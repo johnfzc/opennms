@@ -28,7 +28,6 @@
 
 package org.opennms.core.rpc.commands;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -43,25 +42,45 @@ import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.opennms.core.rpc.utils.mate.ContextKey;
 import org.opennms.core.rpc.utils.mate.EntityScopeProvider;
+import org.opennms.core.rpc.utils.mate.FallbackScope;
 import org.opennms.core.rpc.utils.mate.Interpolator;
 import org.opennms.core.rpc.utils.mate.Scope;
+import org.opennms.core.utils.InetAddressUtils;
 import org.opennms.netmgt.dao.api.NodeDao;
 import org.opennms.netmgt.model.OnmsNode;
 
-@Command(scope = "mate", name = "test", description="Test Meta-Data replacement")
+@Command(scope = "meta", name = "test", description = "Test Meta-Data replacement")
 @Service
-public class MateCommand implements Action {
+public class MetaCommand implements Action {
     @Reference
     public NodeDao nodeDao;
 
     @Reference
     public EntityScopeProvider entityScopeProvider;
 
-    @Option(name = "-n", aliases = "--node-id", description = "Node Id for Service", required = true, multiValued = false)
+    @Option(name = "-n", aliases = "--node-id", description = "Node Id", required = true, multiValued = false)
     private int nodeId;
+
+    @Option(name = "-i", aliases = "--interface-address", description = "Ip Interface Address", required = false, multiValued = false)
+    private String interfaceAddress;
+
+    @Option(name = "-s", aliases = "--service-name", description = "Service name", required = false, multiValued = false)
+    private String serviceName;
 
     @Argument(index = 0, name = "expression", description = "Expression to use", required = true, multiValued = false)
     private String expression;
+
+    private void printScope(final Scope scope) {
+        final Map<String, Set<ContextKey>> grouped = scope.keys().stream()
+                .collect(Collectors.groupingBy(ContextKey::getContext, TreeMap::new, Collectors.toCollection(TreeSet::new)));
+
+        for (final Map.Entry<String, Set<ContextKey>> group : grouped.entrySet()) {
+            System.out.printf("%s:\n", group.getKey());
+            for (final ContextKey contextKey : group.getValue()) {
+                System.out.printf("  %s='%s'\n", contextKey.getKey(), scope.get(contextKey).get());
+            }
+        }
+    }
 
     @Override
     public Object execute() throws Exception {
@@ -72,25 +91,27 @@ public class MateCommand implements Action {
                 return null;
             }
 
-            System.out.printf("Meta-Data for node with nodeId=%d\n---\n", this.nodeId);
-
             // Group by context and sort contexts and keys
             final Scope nodeScope = this.entityScopeProvider.getScopeForNode(this.nodeId);
-            final Map<String, Set<ContextKey>> grouped = nodeScope.keys().stream()
-                    .collect(Collectors.groupingBy(ContextKey::getContext, TreeMap::new, Collectors.toCollection(TreeSet::new)));
+            final Scope interfaceScope = this.entityScopeProvider.getScopeForInterface(this.nodeId, this.interfaceAddress);
+            final Scope serviceScope = this.entityScopeProvider.getScopeForService(this.nodeId, InetAddressUtils.getInetAddress(this.interfaceAddress), this.serviceName);
 
-            for (final Map.Entry<String, Set<ContextKey>> group : grouped.entrySet()) {
-                System.out.printf("%s:\n", group.getKey());
-                for (final ContextKey contextKey : group.getValue()) {
-                    System.out.printf("  %s='%s'\n", contextKey.getKey(), nodeScope.get(contextKey).get());
-                }
+            System.out.printf("---\nMeta-Data for node (id=%d)\n", this.nodeId);
+            printScope(nodeScope);
+
+            if (interfaceAddress != null) {
+                System.out.printf("---\nMeta-Data for interface (ipAddress=%s):\n", interfaceAddress);
+                printScope(interfaceScope);
             }
 
-            final String result = Interpolator.interpolate(this.expression, nodeScope);
+            if (serviceName != null) {
+                System.out.printf("---\nMeta-Data for service (name=%s):\n", serviceName);
+                printScope(serviceScope);
+            }
 
+            final String result = Interpolator.interpolate(this.expression, new FallbackScope(nodeScope, interfaceScope, serviceScope));
             System.out.printf("---\nInput: '%s'\nOutput: '%s'\n", expression, result);
-
-        } catch(final Exception e) {
+        } catch (final Exception e) {
             e.printStackTrace();
         }
 
