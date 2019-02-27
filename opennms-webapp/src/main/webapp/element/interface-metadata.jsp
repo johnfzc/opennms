@@ -116,7 +116,7 @@
         <%
             } else {
         %>
-        <strong>No Metadata available for this interface.</strong><br/><br/>
+        <strong>No Meta-Data available for this interface.</strong><br/><br/>
         <%
             }
         %>

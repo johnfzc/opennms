@@ -120,7 +120,7 @@
         <%
             } else {
         %>
-        <strong>No Metadata available for this service.</strong><br/><br/>
+        <strong>No Meta-Data available for this service.</strong><br/><br/>
         <%
             }
         %>

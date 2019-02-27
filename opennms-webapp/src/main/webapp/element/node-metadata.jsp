@@ -107,7 +107,7 @@
         <%
             } else {
         %>
-        <strong>No Metadata available for this node.</strong><br/><br/>
+        <strong>No Meta-Data available for this node.</strong><br/><br/>
         <%
             }
         %>
