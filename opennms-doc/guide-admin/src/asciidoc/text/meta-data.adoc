@@ -17,7 +17,7 @@ They all use a link:#ga-meta-data-dls[simple DSL] which allows to access the met
 The meta-data DSL allow interpolation of meta-data into a parameter.
 The syntax allows the usage of patterns like `${context:key|context_fallback:key_fallback|...|default}` in an expression.
 
-Each expressions con contain multiple references to meta-data which will be replaced with the according value during evaluation.
+Each expressions can contain multiple references to meta-data which will be replaced with the according value during evaluation.
 Placeholders starts with `${` and ends with `}` containing a reference to a context-key-pair optionally allowing to define multiple fallback context-key-pairs and and optional trailing default value.
 Context and key are separated by a `:`.
 
@@ -38,9 +38,9 @@ If there is no such username defined the fallback `account` will be used.
 If both of them do not exist, the fallback value `admin` will be used.
 
 To resolve the value associated with context-key-pair, the DSL uses scopes which will determine the resolution order.
-The last scope will be queried first and if a scope does not contain the queried (context,key) tuple, the next one will be queried.
+The last scope will be queried first and if a scope does not contain the queried context-key-tuple, the next one will be queried.
 Which scopes are available depends on the environment for which a expression is evaluated and is documented in the according places.
-Some environments also provide additional scopes which are not backed by the persisted mata-data but provide additional meta-data related to the current evaluation.
+Some environments also provide additional scopes which are not backed by the persisted meta-data but provide additional meta-data related to the current evaluation.
 
 ==== Testing an expression
 To test an expression, there is a karaf shell command which interpolates a string containing a pattern to the final result:
