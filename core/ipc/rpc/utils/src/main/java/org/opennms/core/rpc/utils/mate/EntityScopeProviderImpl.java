@@ -74,8 +74,6 @@ public class EntityScopeProviderImpl implements EntityScopeProvider {
             return new SimpleScope(transform(node.getMetaData()));
         });
 
-        // TODO: Add context "node" {id, label, ...}
-
         return metaDataScope;
     }
 
@@ -93,8 +91,6 @@ public class EntityScopeProviderImpl implements EntityScopeProvider {
 
             return new SimpleScope(transform(ipInterface.getMetaData()));
         });
-
-        // TODO: Add context "interface" {id, ip, ...}
 
         return metaDataScope;
     }
@@ -115,8 +111,6 @@ public class EntityScopeProviderImpl implements EntityScopeProvider {
 
             return new SimpleScope(transform(monitoredService.getMetaData()));
         });
-
-        // TODO: Add context "service" {id, name, ...}
 
         return metaDataScope;
     }
