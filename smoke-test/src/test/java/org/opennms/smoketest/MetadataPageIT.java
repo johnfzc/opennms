@@ -81,21 +81,21 @@ public class MetadataPageIT extends OpenNMSSeleniumTestCase {
         sendPost("rest/nodes/SmokeTests:TestNode/ipinterfaces/10.10.10.10/services", service, 201);
         LOG.debug("Service created!");
         LOG.debug("Creating meta-data for node...");
-        sendPut("api/v2/nodes/SmokeTests:TestNode/metaData/contextA/keyA1/valueA1", "", 204);
-        sendPut("api/v2/nodes/SmokeTests:TestNode/metaData/contextA/keyA2/valueA2", "", 204);
-        sendPut("api/v2/nodes/SmokeTests:TestNode/metaData/contextA/keyA3/valueA3", "", 204);
-        sendPut("api/v2/nodes/SmokeTests:TestNode/metaData/contextB/keysecretB1/valueB1", "", 204);
-        sendPut("api/v2/nodes/SmokeTests:TestNode/metaData/contextB/keySecretB2/valueB2", "", 204);
-        sendPut("api/v2/nodes/SmokeTests:TestNode/metaData/contextB/keyB3/valueB3", "", 204);
-        sendPut("api/v2/nodes/SmokeTests:TestNode/metaData/contextC/keypasswordC1/valueC1", "", 204);
-        sendPut("api/v2/nodes/SmokeTests:TestNode/metaData/contextC/keyPasswordC2/valueC2", "", 204);
-        sendPut("api/v2/nodes/SmokeTests:TestNode/metaData/contextC/keyC3/valueC3", "", 204);
+        sendPut("api/v2/nodes/SmokeTests:TestNode/metadata/contextA/keyA1/valueA1", "", 204);
+        sendPut("api/v2/nodes/SmokeTests:TestNode/metadata/contextA/keyA2/valueA2", "", 204);
+        sendPut("api/v2/nodes/SmokeTests:TestNode/metadata/contextA/keyA3/valueA3", "", 204);
+        sendPut("api/v2/nodes/SmokeTests:TestNode/metadata/contextB/keysecretB1/valueB1", "", 204);
+        sendPut("api/v2/nodes/SmokeTests:TestNode/metadata/contextB/keySecretB2/valueB2", "", 204);
+        sendPut("api/v2/nodes/SmokeTests:TestNode/metadata/contextB/keyB3/valueB3", "", 204);
+        sendPut("api/v2/nodes/SmokeTests:TestNode/metadata/contextC/keypasswordC1/valueC1", "", 204);
+        sendPut("api/v2/nodes/SmokeTests:TestNode/metadata/contextC/keyPasswordC2/valueC2", "", 204);
+        sendPut("api/v2/nodes/SmokeTests:TestNode/metadata/contextC/keyC3/valueC3", "", 204);
         LOG.debug("Meta-data for node created!");
         LOG.debug("Creating meta-data for interface...");
-        sendPut("api/v2/nodes/SmokeTests:TestNode/ipinterfaces/10.10.10.10/metaData/contextD/keyD1/valueD1", "", 204);
+        sendPut("api/v2/nodes/SmokeTests:TestNode/ipinterfaces/10.10.10.10/metadata/contextD/keyD1/valueD1", "", 204);
         LOG.debug("Meta-data for interface created!");
         LOG.debug("Creating meta-data for service...");
-        sendPut("api/v2/nodes/SmokeTests:TestNode/ipinterfaces/10.10.10.10/services/ICMP/metaData/contextE/keyE1/valueE1", "", 204);
+        sendPut("api/v2/nodes/SmokeTests:TestNode/ipinterfaces/10.10.10.10/services/ICMP/metadata/contextE/keyE1/valueE1", "", 204);
         LOG.debug("Meta-data for service created!");
     }
 

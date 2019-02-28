@@ -175,7 +175,7 @@ public class NodeIpInterfacesRestService extends AbstractNodeDependentRestServic
     }
 
     @GET
-    @Path("{ipAddress}/metaData")
+    @Path("{ipAddress}/metadata")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public JaxbListWrapper<OnmsMetaData> getMetaData(@Context final UriInfo uriInfo, @PathParam("ipAddress") String ipAddress) {
         final OnmsIpInterface intf = getInterface(uriInfo, ipAddress);
@@ -188,7 +188,7 @@ public class NodeIpInterfacesRestService extends AbstractNodeDependentRestServic
     }
 
     @GET
-    @Path("{ipAddress}/metaData/{context}")
+    @Path("{ipAddress}/metadata/{context}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public JaxbListWrapper<OnmsMetaData> getMetaData(@Context final UriInfo uriInfo, @PathParam("ipAddress") String ipAddress, @PathParam("context") String context) {
         final OnmsIpInterface intf = getInterface(uriInfo, ipAddress);
@@ -203,7 +203,7 @@ public class NodeIpInterfacesRestService extends AbstractNodeDependentRestServic
     }
 
     @GET
-    @Path("{ipAddress}/metaData/{context}/{key}")
+    @Path("{ipAddress}/metadata/{context}/{key}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public JaxbListWrapper<OnmsMetaData> getMetaData(@Context final UriInfo uriInfo, @PathParam("ipAddress") String ipAddress, @PathParam("context") String context, @PathParam("key") String key) {
         final OnmsIpInterface intf = getInterface(uriInfo, ipAddress);
@@ -218,7 +218,7 @@ public class NodeIpInterfacesRestService extends AbstractNodeDependentRestServic
     }
 
     @DELETE
-    @Path("{ipAddress}/metaData/{context}")
+    @Path("{ipAddress}/metadata/{context}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response deleteMetaData(@Context final UriInfo uriInfo, @PathParam("ipAddress") String ipAddress, @PathParam("context") String context) {
         writeLock();
@@ -237,7 +237,7 @@ public class NodeIpInterfacesRestService extends AbstractNodeDependentRestServic
     }
 
     @DELETE
-    @Path("{ipAddress}/metaData/{context}/{key}")
+    @Path("{ipAddress}/metadata/{context}/{key}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response deleteMetaData(@Context final UriInfo uriInfo, @PathParam("ipAddress") String ipAddress, @PathParam("context") String context, @PathParam("key") String key) {
         writeLock();
@@ -256,7 +256,7 @@ public class NodeIpInterfacesRestService extends AbstractNodeDependentRestServic
     }
 
     @POST
-    @Path("{ipAddress}/metaData")
+    @Path("{ipAddress}/metadata")
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response postMetaData(@Context final UriInfo uriInfo, @PathParam("ipAddress") String ipAddress, OnmsMetaData entity) {
         writeLock();
@@ -275,7 +275,7 @@ public class NodeIpInterfacesRestService extends AbstractNodeDependentRestServic
     }
 
     @PUT
-    @Path("{ipAddress}/metaData/{context}/{key}/{value}")
+    @Path("{ipAddress}/metadata/{context}/{key}/{value}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response putMetaData(@Context final UriInfo uriInfo, @PathParam("ipAddress") String ipAddress, @PathParam("context") String context, @PathParam("key") String key, @PathParam("value") String value) {
         writeLock();

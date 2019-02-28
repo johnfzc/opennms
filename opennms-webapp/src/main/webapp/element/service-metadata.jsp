@@ -90,7 +90,7 @@
         %>
             <div class="card">
                 <div class="card-header">
-                    Context <strong><%= entry1.getKey() %></strong>
+                    Context <strong><%= WebSecurityUtils.sanitizeString(entry1.getKey()) %></strong>
                 </div>
                 <!-- general info box -->
                 <div class="card-body p-0">
@@ -104,8 +104,8 @@
                                 }
                 %>
                         <tr>
-                            <th width="30%"><%= entry2.getKey() %></th>
-                            <td><%= value %></td>
+                            <th width="30%"><%= WebSecurityUtils.sanitizeString(entry2.getKey()) %></th>
+                            <td><%= WebSecurityUtils.sanitizeString(value) %></td>
                         </tr>
                 <%
                             }

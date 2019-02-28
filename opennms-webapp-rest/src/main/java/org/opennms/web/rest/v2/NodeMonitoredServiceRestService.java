@@ -224,7 +224,7 @@ public class NodeMonitoredServiceRestService extends AbstractNodeDependentRestSe
     }
 
     @GET
-    @Path("{serviceName}/metaData")
+    @Path("{serviceName}/metadata")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public JaxbListWrapper<OnmsMetaData> getMetaData(@Context final UriInfo uriInfo, @PathParam("serviceName") String serviceName) {
         final OnmsMonitoredService service = getService(uriInfo, serviceName);
@@ -237,7 +237,7 @@ public class NodeMonitoredServiceRestService extends AbstractNodeDependentRestSe
     }
 
     @GET
-    @Path("{serviceName}/metaData/{context}")
+    @Path("{serviceName}/metadata/{context}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public JaxbListWrapper<OnmsMetaData> getMetaData(@Context final UriInfo uriInfo, @PathParam("serviceName") String serviceName, @PathParam("context") String context) {
         final OnmsMonitoredService service = getService(uriInfo, serviceName);
@@ -252,7 +252,7 @@ public class NodeMonitoredServiceRestService extends AbstractNodeDependentRestSe
     }
 
     @GET
-    @Path("{serviceName}/metaData/{context}/{key}")
+    @Path("{serviceName}/metadata/{context}/{key}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public JaxbListWrapper<OnmsMetaData> getMetaData(@Context final UriInfo uriInfo, @PathParam("serviceName") String serviceName, @PathParam("context") String context, @PathParam("key") String key) {
         final OnmsMonitoredService service = getService(uriInfo, serviceName);
@@ -267,7 +267,7 @@ public class NodeMonitoredServiceRestService extends AbstractNodeDependentRestSe
     }
 
     @DELETE
-    @Path("{serviceName}/metaData/{context}")
+    @Path("{serviceName}/metadata/{context}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response deleteMetaData(@Context final UriInfo uriInfo, @PathParam("serviceName") String serviceName, @PathParam("context") String context) {
         writeLock();
@@ -286,7 +286,7 @@ public class NodeMonitoredServiceRestService extends AbstractNodeDependentRestSe
     }
 
     @DELETE
-    @Path("{serviceName}/metaData/{context}/{key}")
+    @Path("{serviceName}/metadata/{context}/{key}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response deleteMetaData(@Context final UriInfo uriInfo, @PathParam("serviceName") String serviceName, @PathParam("context") String context, @PathParam("key") String key) {
         writeLock();
@@ -305,7 +305,7 @@ public class NodeMonitoredServiceRestService extends AbstractNodeDependentRestSe
     }
 
     @POST
-    @Path("{serviceName}/metaData")
+    @Path("{serviceName}/metadata")
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response postMetaData(@Context final UriInfo uriInfo, @PathParam("serviceName") String serviceName, OnmsMetaData entity) {
         writeLock();
@@ -324,7 +324,7 @@ public class NodeMonitoredServiceRestService extends AbstractNodeDependentRestSe
     }
 
     @PUT
-    @Path("{serviceName}/metaData/{context}/{key}/{value}")
+    @Path("{serviceName}/metadata/{context}/{key}/{value}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response putMetaData(@Context final UriInfo uriInfo, @PathParam("serviceName") String serviceName, @PathParam("context") String context, @PathParam("key") String key, @PathParam("value") String value) {
         writeLock();

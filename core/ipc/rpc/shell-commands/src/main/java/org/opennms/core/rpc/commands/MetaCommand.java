@@ -49,6 +49,8 @@ import org.opennms.core.utils.InetAddressUtils;
 import org.opennms.netmgt.dao.api.NodeDao;
 import org.opennms.netmgt.model.OnmsNode;
 
+import com.google.common.base.Strings;
+
 @Command(scope = "meta", name = "test", description = "Test Meta-Data replacement")
 @Service
 public class MetaCommand implements Action {
@@ -58,16 +60,16 @@ public class MetaCommand implements Action {
     @Reference
     public EntityScopeProvider entityScopeProvider;
 
-    @Option(name = "-n", aliases = "--node-id", description = "Node Id", required = true, multiValued = false)
-    private int nodeId;
+    @Option(name = "-n", aliases = "--node", description = "Node ID or FS:FID", required = true, multiValued = false)
+    private String node;
 
-    @Option(name = "-i", aliases = "--interface-address", description = "Ip Interface Address", required = false, multiValued = false)
+    @Option(name = "-i", aliases = "--interface-address", description = "IP Interface Address", required = false, multiValued = false)
     private String interfaceAddress;
 
     @Option(name = "-s", aliases = "--service-name", description = "Service name", required = false, multiValued = false)
     private String serviceName;
 
-    @Argument(index = 0, name = "expression", description = "Expression to use", required = true, multiValued = false)
+    @Argument(index = 0, name = "expression", description = "Expression to use, e.g. '${context:key|fallback_context:fallback_key|default}'", required = false, multiValued = false)
     private String expression;
 
     private void printScope(final Scope scope) {
@@ -85,32 +87,36 @@ public class MetaCommand implements Action {
     @Override
     public Object execute() throws Exception {
         try {
-            final OnmsNode onmsNode = nodeDao.get(this.nodeId);
+            final OnmsNode onmsNode = this.nodeDao.get(this.node);
             if (onmsNode == null) {
-                System.out.printf("Cannot find node with nodeId=%d.\n", this.nodeId);
+                System.out.printf("Cannot find node with ID/FS:FID=%s.\n", this.node);
                 return null;
             }
 
             // Group by context and sort contexts and keys
-            final Scope nodeScope = this.entityScopeProvider.getScopeForNode(this.nodeId);
-            final Scope interfaceScope = this.entityScopeProvider.getScopeForInterface(this.nodeId, this.interfaceAddress);
-            final Scope serviceScope = this.entityScopeProvider.getScopeForService(this.nodeId, InetAddressUtils.getInetAddress(this.interfaceAddress), this.serviceName);
+            final Scope nodeScope = this.entityScopeProvider.getScopeForNode(onmsNode.getId());
+            final Scope interfaceScope = this.entityScopeProvider.getScopeForInterface(onmsNode.getId(), this.interfaceAddress);
+            final Scope serviceScope = this.entityScopeProvider.getScopeForService(onmsNode.getId(), InetAddressUtils.getInetAddress(this.interfaceAddress), this.serviceName);
 
-            System.out.printf("---\nMeta-Data for node (id=%d)\n", this.nodeId);
+            System.out.printf("---\nMeta-Data for node (id=%d)\n", onmsNode.getId());
             printScope(nodeScope);
 
-            if (interfaceAddress != null) {
-                System.out.printf("---\nMeta-Data for interface (ipAddress=%s):\n", interfaceAddress);
+            if (this.interfaceAddress != null) {
+                System.out.printf("---\nMeta-Data for interface (ipAddress=%s):\n", this.interfaceAddress);
                 printScope(interfaceScope);
             }
 
-            if (serviceName != null) {
-                System.out.printf("---\nMeta-Data for service (name=%s):\n", serviceName);
+            if (this.serviceName != null) {
+                System.out.printf("---\nMeta-Data for service (name=%s):\n", this.serviceName);
                 printScope(serviceScope);
             }
 
-            final String result = Interpolator.interpolate(this.expression, new FallbackScope(nodeScope, interfaceScope, serviceScope));
-            System.out.printf("---\nInput: '%s'\nOutput: '%s'\n", expression, result);
+            System.out.printf("---\n");
+
+            if (!Strings.isNullOrEmpty(this.expression)) {
+                final String result = Interpolator.interpolate(this.expression, new FallbackScope(nodeScope, interfaceScope, serviceScope));
+                System.out.printf("Input: '%s'\nOutput: '%s'\n", this.expression, result);
+            }
         } catch (final Exception e) {
             e.printStackTrace();
         }
