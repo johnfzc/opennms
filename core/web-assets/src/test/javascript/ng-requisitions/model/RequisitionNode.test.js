@@ -23,11 +23,20 @@ var onmsNode = {
     'descr': 'eth0',
     'snmp-primary': 'P',
     'status': '1',
+    'meta-data': [
+      {'context': 'requisition', 'key': 'foo', 'value': 'bar'},
+      {'context': 'external1', 'key': 'kickit', 'value': 'lickit'},
+    ],
     'monitored-service': [{
-      'service-name': 'ICMP'
+      'service-name': 'ICMP',
+      'meta-data': [
+        {'context': 'requisition', 'key': 'foo', 'value': 'bar'},
+        {'context': 'external1', 'key': 'kickit', 'value': 'lickit'},
+      ],
     },{
-      'service-name': 'SNMP'
-    }]
+      'service-name': 'SNMP',
+      'meta-data': [],
+    }],
   }],
   'asset': [{
     'name': 'address1',
@@ -60,8 +69,16 @@ test('Model: RequisitionsNode: verify object translation', function () {
   expect(reqNode.categories[0].name).toBe('Servers');
   expect(reqNode.interfaces.length).toBe(1);
   expect(reqNode.interfaces[0].ipAddress).toBe('10.0.0.1');
+  expect(reqNode.interfaces[0].requisitionMetaData[0].key).toBe('foo');
+  expect(reqNode.interfaces[0].requisitionMetaData[0].value).toBe('bar');
+  expect(reqNode.interfaces[0].otherMetaData['external1'][0].key).toBe('kickit');
+  expect(reqNode.interfaces[0].otherMetaData['external1'][0].value).toBe('lickit');
   expect(reqNode.interfaces[0].services.length).toBe(2);
   expect(reqNode.interfaces[0].services[0].name).toBe('ICMP');
+  expect(reqNode.interfaces[0].services[0].requisitionMetaData[0].key).toBe('foo');
+  expect(reqNode.interfaces[0].services[0].requisitionMetaData[0].value).toBe('bar');
+  expect(reqNode.interfaces[0].services[0].otherMetaData['external1'][0].key).toBe('kickit');
+  expect(reqNode.interfaces[0].services[0].otherMetaData['external1'][0].value).toBe('lickit');
   expect(reqNode.assets[1].value).toBe('Pittsboro');
   expect(reqNode.requisitionMetaData[0].key).toBe('foo');
   expect(reqNode.requisitionMetaData[0].value).toBe('bar');
