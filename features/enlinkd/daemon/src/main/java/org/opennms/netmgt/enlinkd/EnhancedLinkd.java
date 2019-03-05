@@ -770,6 +770,9 @@ public class EnhancedLinkd extends AbstractServiceDaemon {
 
     public void reloadTopology() {
         LOG.info("reloadTopology: reload enlinkd topology updaters");
+        LOG.debug("reloadTopology: Loading Bridge Topology.....");
+        m_bridgeTopologyService.load();
+        LOG.debug("reloadTopology: Bridge Topology Loaded");
         for (ProtocolSupported protocol :ProtocolSupported.values()) {
             forceTopologyUpdaterRun(protocol);
             runTopologyUpdater(protocol);
